@@ -1,0 +1,58 @@
+{
+  "globals": {
+    "deltaT": 8,
+    "startPoint": "2000-01-01T00:00:00",
+    "endPoint": "2000-03-07T11:59:59",
+    "deltaTUnit": "hours",
+    "console": false,
+    "output": "csv",
+    "options": {
+      "delimiter": ";",
+      "format": "en-EN"
+    }
+  },
+  "layers": [
+    {
+      "name": "LandscapeLayer",
+      "file": "Resources/Northern KNP landscape.geojson"
+    },
+    {
+      "name": "Perimeter",
+      "file": "Resources/Northern KNP Anthrax.asc"
+    },
+    {
+      "name":"WaterLayer",
+      "file":"Resources/WaterSpots.geojson"
+    }
+  ],
+  "agents": [
+    {
+      "name": "Kudu",
+      "count": 10,
+      "file":"Resources/kudus.csv",
+      "outputs": [
+        {"kind": "trips"}
+      ],
+      "mapping": [
+        {
+          "parameter" : "Energy",
+          "value" : 100
+        }
+      ]
+    },
+    {
+      "name": "Elephant",
+      "count": 0,
+      "file":"Resources/elephants.csv",
+      "outputs": [
+        {"kind": "trips"}
+      ],
+      "mapping": [
+        {
+          "parameter" : "Energy",
+          "value" : 100
+        }
+      ]
+    }
+  ]
+}
