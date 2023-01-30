@@ -92,6 +92,35 @@ public class LandscapeLayer : VectorLayer
 
         throw new ApplicationException($"No Landscape Mapping found for LSCAP_ID = {id}");
     }
+
+    public LandscapeTypes GetTypeForPosition(Position p)
+    {
+        var f = FeatureOnPosition(p);
+        return GetTypeForFeature(f);
+    }
+    
+    public IVectorFeature FindNearestLandAreaOfType(Position p, LandscapeTypes type)
+    {
+        var g = new Point(p.X, p.Y);
+
+        var minDistanceToFeature = Double.MaxValue;
+        IVectorFeature nearestFeature = new VectorFeature();
+        foreach (var vf in Features)
+        {
+            if (type == GetTypeForFeature(vf))
+            {
+                var d = vf.VectorStructured.Geometry.Distance(g);
+
+                if (d < minDistanceToFeature)
+                {
+                    nearestFeature = vf;
+                    minDistanceToFeature = d;
+                }
+            }
+        }
+
+        return nearestFeature;
+    }
     
     public bool IsTargetPositionOfSameCategory(Position currentPosition, Position targetPosition)
     {

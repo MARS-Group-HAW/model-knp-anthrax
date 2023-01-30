@@ -1,0 +1,59 @@
+<!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
+<qgis version="3.28.1-Firenze">
+  <identifier>Waterpoints_zambatis_2016</identifier>
+  <parentidentifier></parentidentifier>
+  <language>ENG</language>
+  <type>dataset</type>
+  <title>Waterpoints_zambatis_2016</title>
+  <abstract>NAME
+The name of a water-point is derived from the information on file but was cross-checked and where necessary, corrected to comply with the spelling and name as given in JJ Kloppers &amp; Hans Bornman’s ‘A Dictionary Of Kruger National Park Place Names’( 2005).
+In a few cases/ incorrect names were being used for particular water-point and these have also been corrected. The spelling of names of other localities are also according to this publication.
+In the case where a registration number is given for catchment dam, this is the dam registration number allocated to the dam by the Dept. of Water &amp; Sanitation. 
+Where the name of water-point is repeated in successive rows but the type of water-point is the same in those rows, this is due to the fact that Excel cannot index on any entry in a merged cell. This consequently requires that each entry is on a separate row.
+As an example, ‘Gomondwane’ is listed on three successive rows. This is the same water point comprising three boreholes, each with its own details, and hence they need for three rows (entries).
+TYPE
+Where more than one borehole is present at a particular water-point, they are numbered , generally according to the drilling sequence- the first borehole dug being labelled ‘No 1’, etc., for example ‘ Borehole No. 1 ENE -60 ‘
+Where additional information is provided after a borehole number e.g. ‘ENE -60’ this means that a particular borehole is located in an ENE direction relative to the reservoir and 60m from it, the reservoir always being the reference poin. Where the direction is given e.g. as,>NW’ this means that this particular borehole is in the same direction as the reservoir, but further on from it.
+In many cases, details on the direction and distance is not available in the borehole’s file.
+RANGER SECTIONAbbreviations is according to Kloppers &amp; Bornman (2005). 
+HOUHoutboschrand; KFIKingfisherspruit;KROCrocodile Bridge; LETLetaba; MANMahlangeni; MAL malelane; MOOMooiplaas ;NWANwanetsi;OLIOlifants; OSALower sabie;PAFPafuri;PHAPhalaborwa; PREPretoriuskop;PUNPunda Maria; SAT Satara; SHA Shangwedzi; SKZSkukuza; STOStolnek; TSHTshokwane; VLAVlakteplas; WOOWoodlands
+HOLE DRILLED 
+The year in which the borehole was drilled. In many cases, the year is not known precisely, in which case it is given for example, ‘c1951’. This information was obtained from the borehole’s file or from Klopper &amp; Bornman (2005). 
+BOREHOLE DEPTH WATER SURFACE DEPTH (m) and BOREHOLE DELIVERY (litters/hours) 
+The original depth of the borehole when it was drilled, the static water level from the ground surface and the delivery of the borehole when drilled. This information was extracted from a particular water-point file. 
+STRUCTURE PRESENT (As at January 2016) 
+W=windmill; R=Concrete reservoir; T=Concrete trough; D=Engine; S=solar powered; E=Electric (ESKOM) powered; WI=Wall (Concrete earthen); 2=Two structures .of the type e.g. 2W=2 windmills
+PERPOSE
+W=wildlife; D=Domestic use; TS=Technical services (road structure &amp; maintenance); Ws= In a Wilderness area.
+STATUS &amp; SCHEDULE
+C-RC= Closed water-point, to remain closed; O-OR=Open water point, to remain open; DRT= Drought water-point. A borehole –fed water-point which either is currently open, i.e. operational, or is to be refurbished and monitored in food condition and keep in reserve, to be activated and brought into operation in the event of a serious drought. It can also serve the dual purpose of providing water to technical services for road and other works; &lt;16-A= Close by end of 2015,with an alternative water-point to have been provide; &lt;20A=Close between 2016 and 2020, with an alternative water-point being provided; 10MB-A= to have been closed and moth balled in 2010, with an alternative water-point have been provided; &lt;16MB-A=open water-point, to be moth-balled by end of 2015, with an alternative water-point to be provided; 10-NA= closed in 2010, with no alternative water-point being provided; &lt;16-NA= Close by end 2015, with no alternative water-point to be provided; &lt;20-NA= closed between 2016 and 2020, with no alternative water-point being provided; 10MB-NA=to have been moth-balled in 2010, with no alternative having been provided;&lt;16TS-A= To become a technical office borehole by end 2015, with no alternative water-point being provided; &lt;20TS-A=To become a technical services borehole between 2016 and 2020, with no alternative water-point being provided.
+REHABILITATION STAGES (As at January 2016)
+1=closure approved but no rehabilitation work has been undertaken; may still contain water; 1* Original scheduled closed, but may be retained for the survival of certain fish species ( Chetae brevis, Tilapia rendalli and Oreochromis mossambicus)2= closed and no longe functional ( drained and empty of water, or large so ); rehabilitation not yet started; 3=Dismantled/demolished, Parlty or Completely ) and the area currently undergoing or still need rehabilitation where necessary (‘work in progress’); 5= Dismantled/ demolished, the rubble steel and steel re en-forcing has been gathered and the Area tidied and cleaned up/ but the material need to be removed; 6= Removal of all structure and construction material completed and the site is fully re-vegetated and stable; 7= Removal of all structure and construction material completed and the site is fully re-vegetated and stable. Only requires periodic monitoring to ensure that erosion and other problems are not developing 
+
+
+Water point layer for KNP with the water point status updated to be correct as of June 2016.</abstract>
+  <keywords vocabulary="Search keys">
+    <keyword>water point data</keyword>
+    <keyword>KNP</keyword>
+    <keyword>June 2016</keyword>
+  </keywords>
+  <links/>
+  <fees></fees>
+  <encoding></encoding>
+  <crs>
+    <spatialrefsys nativeFormat="Wkt">
+      <wkt>GEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["geodetic latitude (Lat)",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433]],AXIS["geodetic longitude (Lon)",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433]],USAGE[SCOPE["Horizontal component of 3D system."],AREA["World."],BBOX[-90,-180,90,180]],ID["EPSG",4326]]</wkt>
+      <proj4>+proj=longlat +datum=WGS84 +no_defs</proj4>
+      <srsid>3452</srsid>
+      <srid>4326</srid>
+      <authid>EPSG:4326</authid>
+      <description>WGS 84</description>
+      <projectionacronym>longlat</projectionacronym>
+      <ellipsoidacronym>EPSG:7030</ellipsoidacronym>
+      <geographicflag>true</geographicflag>
+    </spatialrefsys>
+  </crs>
+  <extent>
+    <spatial minx="30.92999999999999972" maxz="0" miny="-25.49020000000000152" dimensions="2" maxy="-22.35969000000000051" crs="EPSG:4326" maxx="32.02866000000000213" minz="0"/>
+  </extent>
+</qgis>
