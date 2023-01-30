@@ -56,6 +56,9 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     [PropertyDescription(Name = "WaterLayer")]
     public WaterLayer WaterLayer { get; set; }
     
+    [PropertyDescription(Name = "AnthraxLayer")]
+    public AnthraxLayer AnthraxLayer { get; set; }
+    
     /// <summary>
     ///     The perimeter of the simulation environment
     /// </summary>
@@ -77,6 +80,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
 
     public void Tick()
     {
+        // Movement
         if (State == AnimalState.RandomMove)
         {
             var moved = false;
@@ -90,7 +94,6 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                 // this can happen after visiting an water source, or after initialization.
                 if (LandscapeLayer.GetTypeForPosition(Position) != _preferredLandType)
                 {
-                    Console.WriteLine($"WAAAAAAA {Layer.Context.CurrentTick}/{Layer.Context.MaxTicks}");
                     var nearestPreferredFeature = LandscapeLayer.FindNearestLandAreaOfType(Position, _preferredLandType);
                     var posInPreferredArea =nearestPreferredFeature.VectorStructured.Geometry.RandomPositionFromGeometry();
                     bearing = Position.GetBearing(posInPreferredArea);
@@ -173,9 +176,17 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                 State = AnimalState.RandomMove;
             }
         }
-
+        
         // Energy drops each tick
         Energy -= 1;
+        
+        
+        // Infection
+        if (AnthraxLayer.GetValue(Position) > 0)
+        {  
+            // todo: Anthrax logic could go here…
+            Console.WriteLine($"This Kudu is on an anthrax site @ {Position} -> Anthrax Case Count: {AnthraxLayer.GetValue(Position)} ({Layer.Context.CurrentTick})");
+        }
     }
 
     public Guid ID { get; set; }

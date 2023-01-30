@@ -20,6 +20,7 @@ internal static class Program
         description.AddLayer<LandscapeLayer>();
         description.AddLayer<Perimeter>();
         description.AddLayer<WaterLayer>();
+        description.AddLayer<AnthraxLayer>();
 
         description.AddAgent<Elephant, AnimalLayer>();
         description.AddAgent<Kudu, AnimalLayer>();

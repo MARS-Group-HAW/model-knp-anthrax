@@ -21,6 +21,10 @@
       "file": "Resources/Northern KNP Anthrax.asc"
     },
     {
+      "name": "AnthraxLayer",
+      "file": "Resources/Northern KNP Anthrax.asc"
+    },
+    {
       "name":"WaterLayer",
       "file":"Resources/waterpoints/Waterpoints_zambatis_2016.shp"
     }
