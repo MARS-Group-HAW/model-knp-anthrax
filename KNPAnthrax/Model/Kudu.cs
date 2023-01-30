@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Mars.Common;
 using Mars.Common.Core.Random;
@@ -8,7 +10,9 @@ using Mars.Interfaces.Annotations;
 using Mars.Interfaces.Environments;
 using Mars.Interfaces.Layers;
 using Mars.Numerics;
+using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
 using Position = Mars.Interfaces.Environments.Position;
 
 namespace KNPAnthrax.Model;
@@ -78,6 +82,9 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
         Console.WriteLine($"I'm a kudu @ {Position}!");
     }
 
+
+    private List<Position> _positions = new List<Position>();
+    
     public void Tick()
     {
         // Movement
@@ -179,13 +186,31 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
         
         // Energy drops each tick
         Energy -= 1;
-        
+        _positions.Add(Position.Copy());
         
         // Infection
         if (AnthraxLayer.GetValue(Position) > 0)
         {  
             // todo: Anthrax logic could go here…
             Console.WriteLine($"This Kudu is on an anthrax site @ {Position} -> Anthrax Case Count: {AnthraxLayer.GetValue(Position)} ({Layer.Context.CurrentTick})");
+        }
+
+
+        // On last tick export movement of this agent as GeoJSON LineString
+        if (Layer.GetCurrentTick() == Layer.Context.MaxTicks)
+        {
+            var featureCollection = new FeatureCollection();
+            List<Coordinate> coors = new List<Coordinate>();
+
+            foreach (var p in _positions)
+            {
+                coors.Add(new Coordinate(p.X, p.Y));
+            }
+            
+            var ls = new LineString(coors.ToArray());
+            featureCollection.Add(new Feature(ls, new AttributesTable()));
+            var write = new GeoJsonWriter().Write(featureCollection);
+            File.WriteAllText($"Kudu_path_{ID}.geojson", write);
         }
     }
 
