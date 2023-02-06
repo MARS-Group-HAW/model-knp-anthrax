@@ -19,38 +19,38 @@ namespace KNPAnthrax.Model;
 
 public class LandscapeLayer : VectorLayer
 {
-    public new static Dictionary<int, LandscapeTypes> Mapping = new()
+    public new static Dictionary<int, LandscapeType> Mapping = new()
     {
-        {8,  LandscapeTypes.Woody},
-        {9,  LandscapeTypes.Plain},
-        {10, LandscapeTypes.Woody},
-        {11, LandscapeTypes.Woody},
-        {12, LandscapeTypes.Plain}, // "open savanna"?!
+        {8,  LandscapeType.Woody},
+        {9,  LandscapeType.Plain},
+        {10, LandscapeType.Woody},
+        {11, LandscapeType.Woody},
+        {12, LandscapeType.Plain}, // "open savanna"?!
         
-        {15, LandscapeTypes.Plain}, // "high tree savanna"?!
-        {16, LandscapeTypes.Woody},
+        {15, LandscapeType.Plain}, // "high tree savanna"?!
+        {16, LandscapeType.Woody},
         
-        {20, LandscapeTypes.Plain}, // "shrub veld/woodland"?!
-        {21, LandscapeTypes.Woody},
+        {20, LandscapeType.Plain}, // "shrub veld/woodland"?!
+        {21, LandscapeType.Woody},
         
-        {24, LandscapeTypes.Woody},
-        {25, LandscapeTypes.Plain}, // open savanna
-        {26, LandscapeTypes.Woody}, // Tree savanna
-        {27, LandscapeTypes.Woody}, // open tree/ woody
-        {28, LandscapeTypes.Woody}, // Open tree savanna
+        {24, LandscapeType.Woody},
+        {25, LandscapeType.Plain}, // open savanna
+        {26, LandscapeType.Woody}, // Tree savanna
+        {27, LandscapeType.Woody}, // open tree/ woody
+        {28, LandscapeType.Woody}, // Open tree savanna
         
-        {31, LandscapeTypes.Woody}, // Woody/ high tree
+        {31, LandscapeType.Woody}, // Woody/ high tree
         
-        {33, LandscapeTypes.Plain}, // shrub savanna/ few trees
+        {33, LandscapeType.Plain}, // shrub savanna/ few trees
         
-        {35, LandscapeTypes.Woody}, // high tree savanna
+        {35, LandscapeType.Woody}, // high tree savanna
         
         // Types not in excel
-        {23, LandscapeTypes.Unknown},
-        {34, LandscapeTypes.Unknown},
-        {22, LandscapeTypes.Unknown},
-        {32, LandscapeTypes.Unknown},
-        {7, LandscapeTypes.Unknown},
+        {23, LandscapeType.Unknown},
+        {34, LandscapeType.Unknown},
+        {22, LandscapeType.Unknown},
+        {32, LandscapeType.Unknown},
+        {7, LandscapeType.Unknown},
 
     };
 
@@ -81,7 +81,7 @@ public class LandscapeLayer : VectorLayer
         return parent;
     }
 
-    public LandscapeTypes GetTypeForFeature(IVectorFeature f)
+    public LandscapeType GetTypeForFeature(IVectorFeature f)
     {
         var id = Convert.ToInt32(f.VectorStructured.Attributes["LSCAP_ID"]);
 
@@ -93,13 +93,13 @@ public class LandscapeLayer : VectorLayer
         throw new ApplicationException($"No Landscape Mapping found for LSCAP_ID = {id}");
     }
 
-    public LandscapeTypes GetTypeForPosition(Position p)
+    public LandscapeType GetTypeForPosition(Position p)
     {
         var f = FeatureOnPosition(p);
         return GetTypeForFeature(f);
     }
     
-    public IVectorFeature FindNearestLandAreaOfType(Position p, LandscapeTypes type)
+    public IVectorFeature FindNearestLandAreaOfType(Position p, LandscapeType type)
     {
         var g = new Point(p.X, p.Y);
 

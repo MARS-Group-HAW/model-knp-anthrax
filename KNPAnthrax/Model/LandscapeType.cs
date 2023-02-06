@@ -1,6 +1,6 @@
 namespace KNPAnthrax.Model;
 
-public enum LandscapeTypes
+public enum LandscapeType
 {
     Woody,
     Plain,
