@@ -100,9 +100,9 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                 
                 // in case we are on the wrong land type! Quickly move to the nearest comfortable area.
                 // this can happen after visiting an water source, or after initialization.
-                if (LandscapeLayer.GetTypeForPosition(Position) != _preferredLandType)
+                if (!_preferredLandTypes.Contains(LandscapeLayer.GetTypeForPosition(Position)))
                 {
-                    var nearestPreferredFeature = LandscapeLayer.FindNearestLandAreaOfType(Position, _preferredLandType);
+                    var nearestPreferredFeature = LandscapeLayer.FindNearestLandAreaOfType(Position, _preferredLandTypes.First());  // TODO replace First() call with some land type decision logic
                     var posInPreferredArea =nearestPreferredFeature.VectorStructured.Geometry.RandomPositionFromGeometry();
                     bearing = Position.GetBearing(posInPreferredArea);
                 }
