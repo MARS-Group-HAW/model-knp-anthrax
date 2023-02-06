@@ -22,8 +22,8 @@ public class AnimalLayer : AbstractLayer
     /// <param name="registerAgentHandle"></param>
     /// <param name="unregisterAgentHandle"></param>
     /// <returns>true if the agents where registered</returns>
-    public override bool InitLayer(LayerInitData layerInitData, RegisterAgent registerAgentHandle,
-        UnregisterAgent unregisterAgentHandle)
+    public override bool InitLayer(LayerInitData layerInitData, RegisterAgent registerAgentHandle = null,
+        UnregisterAgent unregisterAgentHandle = null)
     {
         base.InitLayer(layerInitData, registerAgentHandle, unregisterAgentHandle);
 

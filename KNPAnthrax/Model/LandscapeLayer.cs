@@ -2,13 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Mars.Common;
-using Mars.Components.Environments;
 using Mars.Components.Layers;
-using Mars.Core.Data;
-using Mars.Interfaces.Annotations;
 using Mars.Interfaces.Data;
-using Mars.Interfaces.Environments;
 using Mars.Interfaces.Layers;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -19,7 +14,7 @@ namespace KNPAnthrax.Model;
 
 public class LandscapeLayer : VectorLayer
 {
-    public new static Dictionary<int, LandscapeType> Mapping = new()
+    public new static readonly Dictionary<int, LandscapeType> Mapping = new()
     {
         {8,  LandscapeType.Woody},
         {9,  LandscapeType.Plain},
