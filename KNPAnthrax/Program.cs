@@ -24,6 +24,7 @@ internal static class Program
 
         description.AddAgent<Elephant, AnimalLayer>();
         description.AddAgent<Kudu, AnimalLayer>();
+        description.AddAgent<Impala, AnimalLayer>();
 
         // Scenario definition: Use config.json that holds the specification of the scenario
         var file = File.ReadAllText("config.json");

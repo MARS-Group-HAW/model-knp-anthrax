@@ -38,10 +38,12 @@ public class AnimalLayer : AbstractLayer
         // Create GeoHashEnvironment with the calculated extent
         Environment = GeoHashEnvironment<Elephant>.BuildByBBox(new BoundingBox(baseExtent), 1000);
         KuduEnvironment = GeoHashEnvironment<Kudu>.BuildByBBox(new BoundingBox(baseExtent), 1000);
+        ImpalaEnvironment = GeoHashEnvironment<Impala>.BuildByBBox(new BoundingBox(baseExtent), 1000);
 
         var agentManager = layerInitData.Container.Resolve<IAgentManager>();
         Elephants = agentManager.Spawn<Elephant, AnimalLayer>().ToList();
         Kudus = agentManager.Spawn<Kudu, AnimalLayer>().ToList();
+        Impalas = agentManager.Spawn<Impala, AnimalLayer>().ToList();
         
         return Kudus.Count > 0;
     }
@@ -51,14 +53,17 @@ public class AnimalLayer : AbstractLayer
     public List<Elephant> Elephants { get; set; }
 
     public List<Kudu> Kudus { get; set; }
-
     
+    public List<Impala> Impalas { get; set; }
+
     [PropertyDescription(Name = "Perimeter")]
     public Perimeter Fence { get; set; }
 
     public GeoHashEnvironment<Elephant> Environment { get; set; }
 
     public GeoHashEnvironment<Kudu> KuduEnvironment { get; set; }
+    
+    public GeoHashEnvironment<Impala> ImpalaEnvironment { get; set; }
 
     #endregion
 }
