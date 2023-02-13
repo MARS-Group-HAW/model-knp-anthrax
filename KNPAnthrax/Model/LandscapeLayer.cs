@@ -14,39 +14,39 @@ namespace KNPAnthrax.Model;
 
 public class LandscapeLayer : VectorLayer
 {
+    /// <summary>
+    /// Mapping of provided shape file regions to our two land-type categories.
+    /// </summary>
     public new static readonly Dictionary<int, LandscapeType> Mapping = new()
     {
         {8,  LandscapeType.Woodland},
         {9,  LandscapeType.Savanna},
         {10, LandscapeType.Woodland},
         {11, LandscapeType.Woodland},
-        {12, LandscapeType.Savanna}, // "open savanna"?!
+        {12, LandscapeType.Savanna},
         
-        {15, LandscapeType.Savanna}, // "high tree savanna"?!
+        {15, LandscapeType.Savanna},
         {16, LandscapeType.Woodland},
         
-        {20, LandscapeType.Savanna}, // "shrub veld/woodland"?!
+        {20, LandscapeType.Woodland},
         {21, LandscapeType.Woodland},
-        
+        {22, LandscapeType.Woodland},
+        {23, LandscapeType.Woodland},
         {24, LandscapeType.Woodland},
-        {25, LandscapeType.Savanna}, // open savanna
-        {26, LandscapeType.Woodland}, // Tree savanna
-        {27, LandscapeType.Woodland}, // open tree/ woody
-        {28, LandscapeType.Woodland}, // Open tree savanna
+        {25, LandscapeType.Savanna},
+        {26, LandscapeType.Savanna},
+        {27, LandscapeType.Woodland},
+        {28, LandscapeType.Savanna},
         
-        {31, LandscapeType.Woodland}, // Woodland/ high tree
+        {31, LandscapeType.Woodland},
+        {32, LandscapeType.Woodland},
+        {33, LandscapeType.Savanna},
         
-        {33, LandscapeType.Savanna}, // shrub savanna/ few trees
-        
-        {35, LandscapeType.Woodland}, // high tree savanna
+        {35, LandscapeType.Savanna},
         
         // Types not in excel
-        {23, LandscapeType.Unknown},
-        {34, LandscapeType.Unknown},
-        {22, LandscapeType.Unknown},
-        {32, LandscapeType.Unknown},
         {7, LandscapeType.Unknown},
-
+        {34, LandscapeType.Unknown},
     };
 
     public override bool InitLayer(
