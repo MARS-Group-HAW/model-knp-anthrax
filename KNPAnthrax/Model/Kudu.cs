@@ -69,6 +69,20 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     public double MaxMovementPerTickInM { get; set; }
     
     /// <summary>
+    ///   
+    /// </summary>
+    [PropertyDescription(Name = "MovementOnWoodland")]
+    public double MovementOnWoodland { get; set; }
+
+    /// <summary>
+    ///    
+    /// </summary>
+    [PropertyDescription(Name = "MovementOnSavanna")]
+    public double MovementOnSavanna { get; set; }
+    
+    
+    
+    /// <summary>
     ///     The layer on which these agents live
     /// </summary>
     private AnimalLayer Layer { get; set; }
@@ -172,9 +186,24 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                 }
 
                 // is target of same category as our current position?
-                if (!LandscapeLayer.IsTargetPositionOfSameCategory(Position, target))
+                var targetType = LandscapeLayer.GetTypeForPosition(target);
+                if (targetType == LandscapeType.Woodland)
                 {
-                    //Console.WriteLine("wrong cateogry");
+                    // every thing is fine.
+                } else if (targetType == LandscapeType.Savanna)
+                {
+                    if (RandomHelper.SmallerThan(MovementOnSavanna))
+                    {
+                        // it's our low probabillity we allow the animal on the savanna area
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+                else
+                {
+                    // unknown land type, try again!
                     continue;
                 }
 

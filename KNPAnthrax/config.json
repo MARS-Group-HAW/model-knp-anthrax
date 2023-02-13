@@ -57,6 +57,14 @@
         {
           "parameter": "MaxMovementPerTickInM",
           "value": 2000
+        },
+        {
+          "parameter": "MovementOnWoodland",
+          "value": 0.90 
+        },
+        {
+          "parameter": "MovementOnSavanna",
+          "value": 0.10
         }
       ]
     },
