@@ -68,7 +68,7 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
     [PropertyDescription(Name = "Perimeter")]
     public Perimeter Perimeter { get; set; }
 
-    private List<LandscapeType> _preferredLandTypes = new(){ LandscapeType.Woody, LandscapeType.Plain };
+    private List<LandscapeType> _preferredLandTypes = new(){ LandscapeType.Woodland, LandscapeType.Savanna };
     
     
     public void Init(AnimalLayer layer)

@@ -2,7 +2,7 @@ namespace KNPAnthrax.Model;
 
 public enum LandscapeType
 {
-    Woody,
-    Plain,
+    Woodland,
+    Savanna,
     Unknown
 }

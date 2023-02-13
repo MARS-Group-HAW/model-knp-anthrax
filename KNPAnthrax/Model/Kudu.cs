@@ -68,7 +68,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     [PropertyDescription(Name = "Perimeter")]
     public Perimeter Perimeter { get; set; }
 
-    private List<LandscapeType> _preferredLandTypes = new() { LandscapeType.Woody };
+    private List<LandscapeType> _preferredLandTypes = new() { LandscapeType.Woodland };
     
     
     public void Init(AnimalLayer layer)

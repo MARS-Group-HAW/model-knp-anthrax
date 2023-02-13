@@ -16,29 +16,29 @@ public class LandscapeLayer : VectorLayer
 {
     public new static readonly Dictionary<int, LandscapeType> Mapping = new()
     {
-        {8,  LandscapeType.Woody},
-        {9,  LandscapeType.Plain},
-        {10, LandscapeType.Woody},
-        {11, LandscapeType.Woody},
-        {12, LandscapeType.Plain}, // "open savanna"?!
+        {8,  LandscapeType.Woodland},
+        {9,  LandscapeType.Savanna},
+        {10, LandscapeType.Woodland},
+        {11, LandscapeType.Woodland},
+        {12, LandscapeType.Savanna}, // "open savanna"?!
         
-        {15, LandscapeType.Plain}, // "high tree savanna"?!
-        {16, LandscapeType.Woody},
+        {15, LandscapeType.Savanna}, // "high tree savanna"?!
+        {16, LandscapeType.Woodland},
         
-        {20, LandscapeType.Plain}, // "shrub veld/woodland"?!
-        {21, LandscapeType.Woody},
+        {20, LandscapeType.Savanna}, // "shrub veld/woodland"?!
+        {21, LandscapeType.Woodland},
         
-        {24, LandscapeType.Woody},
-        {25, LandscapeType.Plain}, // open savanna
-        {26, LandscapeType.Woody}, // Tree savanna
-        {27, LandscapeType.Woody}, // open tree/ woody
-        {28, LandscapeType.Woody}, // Open tree savanna
+        {24, LandscapeType.Woodland},
+        {25, LandscapeType.Savanna}, // open savanna
+        {26, LandscapeType.Woodland}, // Tree savanna
+        {27, LandscapeType.Woodland}, // open tree/ woody
+        {28, LandscapeType.Woodland}, // Open tree savanna
         
-        {31, LandscapeType.Woody}, // Woody/ high tree
+        {31, LandscapeType.Woodland}, // Woodland/ high tree
         
-        {33, LandscapeType.Plain}, // shrub savanna/ few trees
+        {33, LandscapeType.Savanna}, // shrub savanna/ few trees
         
-        {35, LandscapeType.Woody}, // high tree savanna
+        {35, LandscapeType.Woodland}, // high tree savanna
         
         // Types not in excel
         {23, LandscapeType.Unknown},
