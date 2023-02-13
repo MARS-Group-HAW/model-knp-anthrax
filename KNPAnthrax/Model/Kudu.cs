@@ -139,9 +139,12 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                 var nearestWaterDistance = Double.MaxValue;
                 foreach (var w in waterSources)
                 {
-                    var loc = (Point) w.VectorStructured.Geometry;
-                    var t = new Position(loc.X, loc.Y);
-                    var d = t.DistanceInMTo(Position);
+                    var myPositionAsPoint = new Point(Position.X, Position.Y);
+                    var d = w.VectorStructured.Geometry.Distance(myPositionAsPoint);
+                    
+                    //var loc = (Point) w.VectorStructured.Geometry;
+                    //var t = new Position(loc.X, loc.Y);
+                    //var d = t.DistanceInMTo(Position);
 
                     if (d < nearestWaterDistance)
                     {
@@ -152,7 +155,10 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                 
                 // Get coordinates of the nearest water source...
                 //var nearestWaterSource = waterSources.First();
-                var waterSourceLocation = (Point) nearestWaterSource.VectorStructured.Geometry;
+                // @todo: RandomPositionFromGeometry() is needed since die direct way for LINESTRINGs would be the 
+                // requires the nearest POINT on the target geoemtry, but we don't have that from the API. So we just
+                // use a random position somwhere on the linestring, so at least we go in the right direction...
+                var waterSourceLocation = nearestWaterSource.VectorStructured.Geometry.RandomPositionFromGeometry();
                 var target = new Position(waterSourceLocation.X, waterSourceLocation.Y);
                 
                 // Math.Min() of random move distance and distance to water source, so we can reach the sight!

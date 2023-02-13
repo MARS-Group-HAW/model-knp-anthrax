@@ -26,7 +26,7 @@
     },
     {
       "name":"WaterLayer",
-      "file":"Resources/waterpoints/Waterpoints_zambatis_2016.shp"
+      "file":"Resources/water/knp_water_north_merged.geojson"
     }
   ],
   "agents": [
