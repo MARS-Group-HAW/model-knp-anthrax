@@ -105,6 +105,9 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     [PropertyDescription(Name = "Perimeter")]
     public Perimeter Perimeter { get; set; }
 
+    [PropertyDescription(Name = "KuduMovement")]
+    public KuduMovement KuduMovement { get; set; }
+    
     private List<LandscapeType> _preferredLandTypes = new() { LandscapeType.Woodland };
     
     
@@ -285,8 +288,11 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
         if (AnthraxLayer.GetValue(Position) > 0)
         {  
             // todo: Anthrax logic could go here…
-            Console.WriteLine($"This Kudu is on an anthrax site @ {Position} -> Anthrax Case Count: {AnthraxLayer.GetValue(Position)} ({Layer.Context.CurrentTick})");
+            //Console.WriteLine($"This Kudu is on an anthrax site @ {Position} -> Anthrax Case Count: {AnthraxLayer.GetValue(Position)} ({Layer.Context.CurrentTick})");
         }
+        
+        // Leave Movement trace for heatmap
+        KuduMovement[Position] += 0.1;
 
 
         // On last tick export movement of this agent as GeoJSON LineString

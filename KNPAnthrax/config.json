@@ -27,6 +27,10 @@
     {
       "name":"WaterLayer",
       "file":"Resources/water/knp_water_north_merged.geojson"
+    },
+    {
+      "name": "KuduMovement",
+      "file": "Resources/Northern KNP.asc"
     }
   ],
   "agents": [
