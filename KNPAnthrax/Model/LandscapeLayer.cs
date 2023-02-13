@@ -141,12 +141,14 @@ public class LandscapeLayer : VectorLayer
         var g = new Point(p.X, p.Y);
         foreach (var f in Features)
         {
-            if (f.VectorStructured.Geometry.Contains(g))
+            // f.VectorStructured.Geometry.Contains(g)) fails if p is ON / part of the boundary of f!
+            // So we use Covers(), see https://nettopologysuite.github.io/NetTopologySuite/api/NetTopologySuite.Geometries.Geometry.html#NetTopologySuite_Geometries_Geometry_Contains_NetTopologySuite_Geometries_Geometry_
+            if (f.VectorStructured.Geometry.Covers(g))
             {
                 return f;
             }
         }
-
+        
         throw new ArgumentException($"Position {p} is not covered by the provided Landscape Areas");
     }
 
@@ -171,6 +173,7 @@ public class LandscapeLayer : VectorLayer
                 return f.VectorStructured.Geometry.RandomPositionFromGeometry();
             }
         }
+        
         throw new ArgumentException($"No shapes are available for the given types {types.ToString()}");
     }
     
