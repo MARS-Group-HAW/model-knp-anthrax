@@ -49,6 +49,14 @@
         {
           "parameter": "SpawnSavannaProbability",
           "value": 0.05
+        },
+        {
+          "parameter": "MinMovementPerTickInM",
+          "value": 1500
+        },
+        {
+          "parameter": "MaxMovementPerTickInM",
+          "value": 2000
         }
       ]
     },
@@ -71,6 +79,14 @@
         {
           "parameter": "SpawnSavannaProbability",
           "value": 0.60
+        },
+        {
+          "parameter": "MinMovementPerTickInM",
+          "value": 500
+        },
+        {
+          "parameter": "MaxMovementPerTickInM",
+          "value": 1000
         }
       ]
     },

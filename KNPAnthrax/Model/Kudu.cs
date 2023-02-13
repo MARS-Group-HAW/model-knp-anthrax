@@ -57,6 +57,18 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     public double SpawnSavannaProbability { get; set; }
     
     /// <summary>
+    ///   
+    /// </summary>
+    [PropertyDescription(Name = "MinMovementPerTickInM")]
+    public double MinMovementPerTickInM { get; set; }
+
+    /// <summary>
+    ///    
+    /// </summary>
+    [PropertyDescription(Name = "MaxMovementPerTickInM")]
+    public double MaxMovementPerTickInM { get; set; }
+    
+    /// <summary>
     ///     The layer on which these agents live
     /// </summary>
     private AnimalLayer Layer { get; set; }
@@ -92,7 +104,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
 
         if ((SpawnWoodlandProbability + SpawnSavannaProbability) != 1.0)
         {
-            throw new ArgumentException("Spawning probabilities muss add up to 100.");
+            throw new ArgumentException("Spawning probabilities must add up to 100.");
         }
 
         // no position set from kudu.csv -> choose random position according to land-type spawn probability
@@ -119,6 +131,16 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     }
 
 
+    /// <summary>
+    /// Generates a random movement distance for one tick.
+    /// </summary>
+    /// <returns></returns>
+    private double GetDistance()
+    {
+        return RandomHelper.NextDouble(RandomHelper.Random, MinMovementPerTickInM, MaxMovementPerTickInM);
+    }
+
+    
     private List<Position> _positions = new List<Position>();
     
     public void Tick()
@@ -130,7 +152,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
             do
             {
                 var bearing = RandomHelper.NextDouble(RandomHelper.Random, 0, 360);
-                var distance = RandomHelper.NextDouble(RandomHelper.Random, 750, 1250); // todo: konfigurarierbar?
+                var distance = GetDistance();
                 var target = Position.CalculateRelativePosition(bearing, distance);
                 
                 // in case we are on the wrong land type! Quickly move to the nearest comfortable area.
@@ -199,7 +221,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                 var target = new Position(waterSourceLocation.X, waterSourceLocation.Y);
                 
                 // Math.Min() of random move distance and distance to water source, so we can reach the sight!
-                var distance = Math.Min(target.DistanceInMTo(Position), RandomHelper.NextDouble(RandomHelper.Random, 750, 1250)); // todo: konfigurarierbar?
+                var distance = Math.Min(target.DistanceInMTo(Position), GetDistance());
                 
                 // ... and change the agent's bearing such that it looks in the direction of the water source
                 var bearing = Position.GetBearing(target);
