@@ -18,7 +18,7 @@
     },
     {
       "name": "Perimeter",
-      "file": "Resources/perimeter.geojsonWa"
+      "file": "Resources/perimeter.geojson"
     },
     {
       "name": "AnthraxLayer",
@@ -39,8 +39,16 @@
       ],
       "mapping": [
         {
-          "parameter" : "Energy",
-          "value" : 100
+          "parameter": "Energy",
+          "value": 100
+        },
+        {
+          "parameter": "SpawnWoodlandProbability",
+          "value": 0.95
+        },
+        {
+          "parameter": "SpawnSavannaProbability",
+          "value": 0.05
         }
       ]
     },
@@ -53,8 +61,16 @@
       ],
       "mapping": [
         {
-          "parameter" : "Energy",
-          "value" : 100
+          "parameter": "Energy",
+          "value": 100
+        },
+        {
+          "parameter": "SpawnWoodlandProbability",
+          "value": 0.40
+        },
+        {
+          "parameter": "SpawnSavannaProbability",
+          "value": 0.60
         }
       ]
     },

@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Mars.Common;
+using Mars.Common.Core.Collections;
+using Mars.Common.Core.Random;
 using Mars.Components.Layers;
 using Mars.Interfaces.Data;
 using Mars.Interfaces.Layers;
@@ -145,6 +148,30 @@ public class LandscapeLayer : VectorLayer
         }
 
         throw new ArgumentException($"Position {p} is not covered by the provided Landscape Areas");
+    }
+
+    /// <summary>
+    /// Gets a random position somewhere in the simulation area where the landscapetype is of one of the given
+    /// types.
+    /// 
+    /// </summary>
+    /// <param name="types"></param>
+    /// <returns></returns>
+    /// <exception cref="ArgumentException"></exception>
+    public Position GetRandomPositionForLandscapeType(List<LandscapeType> types)
+    {
+        // Shuffle all available features to get randomness
+        var shuffledFeatures = Features.ShuffleEnumerable(RandomHelper.Random);
+
+        foreach (var f in shuffledFeatures)
+        {
+            var featureType = GetTypeForFeature(f);
+            if (types.Contains(featureType))
+            {
+                return f.VectorStructured.Geometry.RandomPositionFromGeometry();
+            }
+        }
+        throw new ArgumentException($"No shapes are available for the given types {types.ToString()}");
     }
     
     /// <summary>

@@ -44,6 +44,17 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     [PropertyDescription(Name = "State")]
     public AnimalState State { get; set; }
 
+    /// <summary>
+    ///   
+    /// </summary>
+    [PropertyDescription(Name = "SpawnWoodlandProbability")]
+    public double SpawnWoodlandProbability { get; set; }
+
+    /// <summary>
+    ///    
+    /// </summary>
+    [PropertyDescription(Name = "SpawnSavannaProbability")]
+    public double SpawnSavannaProbability { get; set; }
     
     /// <summary>
     ///     The layer on which these agents live
@@ -71,13 +82,39 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     private List<LandscapeType> _preferredLandTypes = new() { LandscapeType.Woodland };
     
     
+    
+    
     public void Init(AnimalLayer layer)
     {
         Layer = layer;
         Energy = RandomHelper.NextDouble(RandomHelper.Random, 50, 100);
         State = AnimalState.RandomMove;
-        
-        Position = Position.CreateGeoPosition(Longitude, Latitude);
+
+        if ((SpawnWoodlandProbability + SpawnSavannaProbability) != 1.0)
+        {
+            throw new ArgumentException("Spawning probabilities muss add up to 100.");
+        }
+
+        // no position set from kudu.csv -> choose random position according to land-type spawn probability
+        if (Latitude == 0.0 || Longitude == 0.0)
+        {
+            if (RandomHelper.SmallerThan(SpawnWoodlandProbability))
+            {
+                // spawn on Woodland
+                Position = LandscapeLayer.GetRandomPositionForLandscapeType(new List<LandscapeType>() {LandscapeType.Woodland});
+            }
+            else
+            {
+                // Spawn on Savanna   
+                Position = LandscapeLayer.GetRandomPositionForLandscapeType(new List<LandscapeType>() {LandscapeType.Savanna});
+            }
+        }
+        else
+        {
+            // position defined in csv file
+            Position = Position.CreateGeoPosition(Longitude, Latitude);
+        }
+
         Console.WriteLine($"I'm a kudu @ {Position}!");
     }
 
