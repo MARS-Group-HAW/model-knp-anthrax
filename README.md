@@ -6,10 +6,12 @@
 
 ### Kudu
 
-
+Landscapetypes: Woodland
 
 
 ### Impala
+
+Landscapetypes: Woodland, Savanna
 
 
 ## Layers
