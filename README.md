@@ -12,7 +12,7 @@ In Rider you can just open the `KNPAnthrax.sln` file and hit the "Run"-Button in
 
 For configuration the model you need to change the values inside the `config.json` file. See the following sections for configuration options for the simulation/agents.
 
-
+If you can't install .NET you can also use the provided [self-contained boxes](https://github.com/MARS-Group-HAW/knp-anthrax-model/releases), choose you platform and run the `KNPAnthrax` execuatabe. You can configure the model with the `config.json` but wont be able run/test changes in the source-code.
 
 ## Simulation
 
