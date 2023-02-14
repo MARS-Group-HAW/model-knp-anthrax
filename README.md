@@ -53,7 +53,7 @@ Landscapetypes: Woodland, Savanna
 
 Provides landtype classification. Input data are manually mapped againts `Woodland` and `Savanna` categories.
 
-### Perimter
+### Perimeter
 
 Simulation area, derived from union of landscape layer input.
 
@@ -69,10 +69,6 @@ POIS and rivers. GeoJSON can contain POINTs or LINESTRINGs. Derived from various
 
 Raster data with 1x1km resolution containing Anthrax carcasses from KNP northern area.
 
-
-
-
-
 ## Outputs
 
 - `Kudu_trips.geojson` and `Impala_trips.geojson` contain time-series movement data of each agent type. Can be visualized with [kepler.gl](https://kepler.gl), though due to the 8h hour resulation you can't really see much)
@@ -83,4 +79,4 @@ Raster data with 1x1km resolution containing Anthrax carcasses from KNP northern
 
 
 
-Outputs can be visualized with [kepler.gl](https://kepler.gl/). It's a browser based visualization tool and needs to be reconfigured each time. For convenience you can use the Jupyter Notebook with a preset configured to load some data (see folder `Analysis/` ). Due to complicatated dependencies you can use the [Docker Container](https://www.docker.com/products/docker-desktop/) for starting a Jupyter Hub with all needed dependencies.
+Outputs can be visualized with [kepler.gl](https://kepler.gl/). It's a browser based visualization tool and needs to be reconfigured each time. For convenience you can use the Jupyter Notebook with a preset configured to load some data (see folder `Analysis/` ). Due to complicatated dependencies you can use the [Docker Container](https://www.docker.com/products/docker-desktop/) for starting a Jupyter Hub with all needed dependencies (start it with `$ ./notebookdocker.sh`).
