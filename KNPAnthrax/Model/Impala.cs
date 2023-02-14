@@ -12,6 +12,7 @@ using Mars.Interfaces.Layers;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
+using NetTopologySuite.Operation.Distance;
 using Position = Mars.Interfaces.Environments.Position;
 
 namespace KNPAnthrax.Model;
@@ -73,6 +74,13 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
     /// </summary>
     [PropertyDescription(Name = "MaxMovementPerTickInM")]
     public double MaxMovementPerTickInM { get; set; }
+    
+    /// <summary>
+    ///    
+    /// </summary>
+    [PropertyDescription(Name = "MaxDistanceFromWaterInM")]
+    public double MaxDistanceFromWaterInM { get; set; }
+
     
     /// <summary>
     ///    
@@ -203,9 +211,22 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
                 // is target of same category as our current position?
                 if (!LandscapeLayer.IsTargetPositionOfSameCategory(Position, target))
                 {
-                    //Console.WriteLine("wrong cateogry");
                     continue;
                 }
+                
+                // if the agent is to far from a water source walk towards it!
+                var nearestWaterSource = WaterLayer.GetNearestWaterSource(Position);
+                var g = new Point(Position.X, Position.Y);
+                //var d = nearestWaterSource.VectorStructured.Geometry.Distance(g);
+                var ps = DistanceOp.NearestPoints(g, nearestWaterSource.VectorStructured.Geometry);
+                var wPos = new Position(ps[1].X, ps[1].Y);
+                var d = GeoPositionExtension.DistanceInMTo(Position, wPos);
+                
+                if (d > MaxDistanceFromWaterInM)
+                {
+                    bearing = Position.GetBearing(wPos);
+                }
+                
 
                 Position = Layer.ImpalaEnvironment.MoveTowards(this, bearing, distance);
                 moved = true;

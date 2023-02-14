@@ -133,6 +133,10 @@
           "value": 1000
         },
         {
+          "parameter": "MaxDistanceFromWaterInM",
+          "value": 5000
+        },
+        {
           "parameter": "AnthraxInfectionProbability",
           "value": 0.4
         },
