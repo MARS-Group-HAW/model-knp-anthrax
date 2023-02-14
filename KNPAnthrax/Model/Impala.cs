@@ -75,6 +75,30 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
     public double MaxMovementPerTickInM { get; set; }
     
     /// <summary>
+    ///    
+    /// </summary>
+    [PropertyDescription(Name = "AnthraxInfectionProbability")]
+    public double AnthraxInfectionProbability { get; set; }
+
+    /// <summary>
+    ///    
+    /// </summary>
+    [PropertyDescription(Name = "MinInfectionDurationInTicks")]
+    public int MinInfectionDurationInTicks { get; set; }
+
+    /// <summary>
+    ///    
+    /// </summary>
+    [PropertyDescription(Name = "MaxInfectionDurationInTicks")]
+    public int MaxInfectionDurationInTicks { get; set; }
+
+    [PropertyDescription(Name = "OutputAgentTrack")]
+    public bool OutputAgentTrack { get; set; }
+
+    
+    
+    
+    /// <summary>
     ///     The layer on which these agents live
     /// </summary>
     private AnimalLayer Layer { get; set; }
@@ -101,7 +125,10 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
     public ImpalaMovement ImpalaMovement { get; set; }
     
     private List<LandscapeType> _preferredLandTypes = new(){ LandscapeType.Woodland, LandscapeType.Savanna };
-    
+
+
+    private int _infectedCounter = 0;
+    private List<long> _LeaveAnthraxTraceTicks = new();
     
     public void Init(AnimalLayer layer)
     {
@@ -133,10 +160,7 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
             // position defined in csv file
             Position = Position.CreateGeoPosition(Longitude, Latitude);
         }
-        
-        //Console.WriteLine($"I'm an impala @ {Position}!");
     }
-
 
     private List<Position> _positions = new List<Position>();
 
@@ -161,6 +185,12 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
                 var distance = GetDistance();
                 var target = Position.CalculateRelativePosition(bearing, distance);
                 
+                // is target still in area of KNP?
+                if (!Perimeter.IsPointInside(target))
+                {
+                    continue;
+                }
+                
                 // in case we are on the wrong land type! Quickly move to the nearest comfortable area.
                 // this can happen after visiting an water source, or after initialization.
                 if (!_preferredLandTypes.Contains(LandscapeLayer.GetTypeForPosition(Position)))
@@ -168,13 +198,6 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
                     var nearestPreferredFeature = LandscapeLayer.FindNearestLandAreaOfType(Position, _preferredLandTypes.First());  // TODO replace First() call with some land type decision logic
                     var posInPreferredArea =nearestPreferredFeature.VectorStructured.Geometry.RandomPositionFromGeometry();
                     bearing = Position.GetBearing(posInPreferredArea);
-                }
-
-                // is target still in area of KNP?
-                if (!Perimeter.IsPointInside(target))
-                {
-                    //Console.WriteLine("outside perimeter");
-                    continue;
                 }
 
                 // is target of same category as our current position?
@@ -261,20 +284,42 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
         
         // Infection
         if (AnthraxLayer.IsInRaster(Position) && AnthraxLayer.GetValue(Position) > 0)
-        {  
-            // todo: Anthrax logic could go here…
-            //Console.WriteLine($"This Impala is on an anthrax site @ {Position} -> Anthrax Case Count: {AnthraxLayer.GetValue(Position)} ({Layer.Context.CurrentTick})");
+        {
+            var beta = AnthraxLayer.GetValue(Position) * AnthraxInfectionProbability;
+
+            if (RandomHelper.SmallerThan(beta))
+            {
+                _infectedCounter += 1;
+                var deathOccuresInTicks = RandomHelper.NextInteger(RandomHelper.Random, MinInfectionDurationInTicks,
+                    MaxInfectionDurationInTicks + 1);
+                var x = Layer.Context.CurrentTick + deathOccuresInTicks;
+                _LeaveAnthraxTraceTicks.Add(x);
+            }
         }
 
+        // Leave Anthrax trail on the Map / animal dies
+        if (_infectedCounter > 0)
+        {
+            if (_LeaveAnthraxTraceTicks.Contains(Layer.Context.CurrentTick))
+            {
+                _infectedCounter -= 1;
+                _LeaveAnthraxTraceTicks.Remove(Layer.Context.CurrentTick);
+
+                if (AnthraxLayer.IsInRaster(Position))
+                {
+                    AnthraxLayer[Position] += 1;
+                }
+            }
+        }
+        
         // Leave Movement trace for heatmap
         if (ImpalaMovement.IsInRaster(Position))
         {
-            Console.WriteLine("leave trace");
             ImpalaMovement[Position] += 0.1;
         }
 
         // On last tick export movement of this agent as GeoJSON LineString
-        if (Layer.GetCurrentTick() == Layer.Context.MaxTicks)
+        if (OutputAgentTrack && Layer.GetCurrentTick() == Layer.Context.MaxTicks)
         {
             var featureCollection = new FeatureCollection();
             List<Coordinate> coors = new List<Coordinate>();

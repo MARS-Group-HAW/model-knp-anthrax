@@ -40,7 +40,7 @@
   "agents": [
     {
       "name": "Kudu",
-      "count": 0,
+      "count": 50,
       "file":"Resources/kudus.csv",
       "outputs": [
         {"kind": "trips"}
@@ -81,6 +81,22 @@
         {
           "parameter": "MaxDistanceFromWaterInM",
           "value": 3500
+        },
+        {
+          "parameter": "AnthraxInfectionProbability",
+          "value": 0.4
+        },
+        {
+          "parameter": "MinInfectionDurationInTicks",
+          "value": 9 
+        },
+        {
+          "parameter": "MaxInfectionDurationInTicks",
+          "value": 42
+        },
+        {
+          "parameter": "OutputAgentTrack",
+          "value": false
         }
       ]
     },
@@ -115,6 +131,22 @@
         {
           "parameter": "MaxMovementPerTickInM",
           "value": 1000
+        },
+        {
+          "parameter": "AnthraxInfectionProbability",
+          "value": 0.4
+        },
+        {
+          "parameter": "MinInfectionDurationInTicks",
+          "value": 9
+        },
+        {
+          "parameter": "MaxInfectionDurationInTicks",
+          "value": 42
+        },
+        {
+          "parameter": "OutputAgentTrack",
+          "value": false
         }
       ]
     },

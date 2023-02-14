@@ -93,6 +93,26 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     [PropertyDescription(Name = "MaxDistanceFromWaterInM")]
     public double MaxDistanceFromWaterInM { get; set; }
     
+    /// <summary>
+    ///    
+    /// </summary>
+    [PropertyDescription(Name = "AnthraxInfectionProbability")]
+    public double AnthraxInfectionProbability { get; set; }
+
+    /// <summary>
+    ///    
+    /// </summary>
+    [PropertyDescription(Name = "MinInfectionDurationInTicks")]
+    public int MinInfectionDurationInTicks { get; set; }
+
+    /// <summary>
+    ///    
+    /// </summary>
+    [PropertyDescription(Name = "MaxInfectionDurationInTicks")]
+    public int MaxInfectionDurationInTicks { get; set; }
+    
+    [PropertyDescription(Name = "OutputAgentTrack")]
+    public bool OutputAgentTrack { get; set; }
     
     /// <summary>
     ///     The layer on which these agents live
@@ -121,9 +141,8 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     public KuduMovement KuduMovement { get; set; }
     
     private List<LandscapeType> _preferredLandTypes = new() { LandscapeType.Woodland };
-    
-    
-    
+    private int _infectedCounter = 0;
+    private List<long> _LeaveAnthraxTraceTicks = new();
     
     public void Init(AnimalLayer layer)
     {
@@ -155,8 +174,6 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
             // position defined in csv file
             Position = Position.CreateGeoPosition(Longitude, Latitude);
         }
-
-        //Console.WriteLine($"I'm a kudu @ {Position}!");
     }
 
 
@@ -184,6 +201,12 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                 var distance = GetDistance();
                 var target = Position.CalculateRelativePosition(bearing, distance);
                 
+                // is target still in area of KNP?
+                if (!Perimeter.IsPointInside(target))
+                {
+                    continue;
+                }
+                
                 // in case we are on the wrong land type! Quickly move to the nearest comfortable area.
                 // this can happen after visiting an water source, or after initialization.
                 if (!_preferredLandTypes.Contains(LandscapeLayer.GetTypeForPosition(Position)))
@@ -191,13 +214,6 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                     var nearestPreferredFeature = LandscapeLayer.FindNearestLandAreaOfType(Position, _preferredLandTypes.First());  // TODO replace First() call with some land type decision logic
                     var posInPreferredArea =nearestPreferredFeature.VectorStructured.Geometry.RandomPositionFromGeometry();
                     bearing = Position.GetBearing(posInPreferredArea);
-                }
-
-                // is target still in area of KNP?
-                if (!Perimeter.IsPointInside(target))
-                {
-                    //Console.WriteLine("outside perimeter");
-                    continue;
                 }
 
                 // is target of same category as our current position?
@@ -310,13 +326,37 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
         _positions.Add(Position.Copy());
         
         // Infection
-        
         if (AnthraxLayer.IsInRaster(Position) && AnthraxLayer.GetValue(Position) > 0)
-        {  
-            // todo: Anthrax logic could go here…
-            //Console.WriteLine($"This Kudu is on an anthrax site @ {Position} -> Anthrax Case Count: {AnthraxLayer.GetValue(Position)} ({Layer.Context.CurrentTick})");
+        {
+            var beta = AnthraxLayer.GetValue(Position) * AnthraxInfectionProbability;
+
+            if (RandomHelper.SmallerThan(beta))
+            {
+                _infectedCounter += 1;
+                
+                var DeathOccuresInTicks = RandomHelper.NextInteger(RandomHelper.Random, MinInfectionDurationInTicks,
+                    MaxInfectionDurationInTicks + 1);
+                var x = Layer.Context.CurrentTick + DeathOccuresInTicks;
+
+                _LeaveAnthraxTraceTicks.Add(x);
+            }
         }
-        
+
+        // Leave Anthrax trail on the Map / animal dies
+        if (_infectedCounter > 0)
+        {
+            if (_LeaveAnthraxTraceTicks.Contains(Layer.Context.CurrentTick))
+            {
+                _infectedCounter -= 1;
+                _LeaveAnthraxTraceTicks.Remove(Layer.Context.CurrentTick);
+
+                if (AnthraxLayer.IsInRaster(Position))
+                {
+                    AnthraxLayer[Position] += 1;
+                }
+            }
+        }
+
         // Leave Movement trace for heatmap
         if (KuduMovement.IsInRaster(Position))
         {
@@ -324,7 +364,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
         }
 
         // On last tick export movement of this agent as GeoJSON LineString
-        if (Layer.GetCurrentTick() == Layer.Context.MaxTicks)
+        if (OutputAgentTrack && Layer.GetCurrentTick() == Layer.Context.MaxTicks)
         {
             var featureCollection = new FeatureCollection();
             List<Coordinate> coors = new List<Coordinate>();
