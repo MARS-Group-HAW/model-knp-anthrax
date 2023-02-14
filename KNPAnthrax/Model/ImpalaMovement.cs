@@ -28,16 +28,11 @@ public class ImpalaMovement : RasterLayer, ISteppedActiveLayer
             {
                 var value = this[x, y];
                 
-
-                
                 if (value == 0)
                 {
                     continue;
                 }
-                
-                Console.WriteLine(value);
 
-                
                 // p4      p3
                 // + ---- +
                 // |      |
