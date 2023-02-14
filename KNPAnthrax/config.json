@@ -31,19 +31,27 @@
     {
       "name": "KuduMovement",
       "file": "Resources/Northern KNP.asc"
+    },
+    {
+      "name": "ImpalaMovement",
+      "file": "Resources/Northern KNP.asc"
     }
   ],
   "agents": [
     {
       "name": "Kudu",
-      "count": 10,
+      "count": 0,
       "file":"Resources/kudus.csv",
       "outputs": [
         {"kind": "trips"}
       ],
       "mapping": [
         {
-          "parameter": "Energy",
+          "parameter": "SpawnMinEnergy",
+          "value": 50
+        },
+        {
+          "parameter": "SpawnMaxEnergy",
           "value": 100
         },
         {
@@ -69,12 +77,16 @@
         {
           "parameter": "MovementOnSavanna",
           "value": 0.10
+        },
+        {
+          "parameter": "MaxDistanceFromWaterInM",
+          "value": 3500
         }
       ]
     },
     {
       "name": "Impala",
-      "count": 10,
+      "count": 1,
       "file":"Resources/impalas.csv",
       "outputs": [
         {"kind": "trips"}

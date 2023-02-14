@@ -1,33 +1,20 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using Mars.Components.Environments;
 using Mars.Components.Layers;
 using Mars.Interfaces.Annotations;
-using Mars.Interfaces.Data;
-using Mars.Interfaces.Environments;
 using Mars.Interfaces.Layers;
-using Mars.Numerics.Distances;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
-using Npgsql.Internal.TypeHandlers.GeometricHandlers;
 
 namespace KNPAnthrax.Model;
 
-public class KuduMovement : RasterLayer, ISteppedActiveLayer
+public class ImpalaMovement : RasterLayer, ISteppedActiveLayer
 {
     [PropertyDescription(Name = "Perimeter")]
     public Perimeter Fence { get; set; }
-    
-    public override bool InitLayer(LayerInitData layerInitData, RegisterAgent registerAgentHandle = null,
-        UnregisterAgent unregisterAgent = null)
-    {
-        var init = base.InitLayer(layerInitData, registerAgentHandle, unregisterAgent);
-        return init;
-    }
-    
-    /// <summary>
+
+        /// <summary>
     /// 
     /// </summary>
     public void ToGeoJSON()
@@ -41,10 +28,15 @@ public class KuduMovement : RasterLayer, ISteppedActiveLayer
             {
                 var value = this[x, y];
                 
+
+                
                 if (value == 0)
                 {
                     continue;
                 }
+                
+                Console.WriteLine(value);
+
                 
                 // p4      p3
                 // + ---- +
@@ -79,11 +71,6 @@ public class KuduMovement : RasterLayer, ISteppedActiveLayer
 
     public void PostTick()
     {
-        if (GetCurrentTick() % 50 == 0 ||  GetCurrentTick() == 1 || GetCurrentTick() == Context.MaxTicks)
-        {
-            Console.WriteLine($"{GetCurrentTick()}/{Context.MaxTicks}");
-        }
-        
         if (GetCurrentTick() == Context.MaxTicks)
         {
             ToGeoJSON();

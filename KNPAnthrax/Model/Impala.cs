@@ -91,6 +91,9 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
     [PropertyDescription(Name = "Perimeter")]
     public Perimeter Perimeter { get; set; }
 
+    [PropertyDescription(Name = "ImpalaMovement")]
+    public ImpalaMovement ImpalaMovement { get; set; }
+    
     private List<LandscapeType> _preferredLandTypes = new(){ LandscapeType.Woodland, LandscapeType.Savanna };
     
     
@@ -125,7 +128,7 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
             Position = Position.CreateGeoPosition(Longitude, Latitude);
         }
         
-        Console.WriteLine($"I'm an impala @ {Position}!");
+        //Console.WriteLine($"I'm an impala @ {Position}!");
     }
 
 
@@ -251,12 +254,18 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
         _positions.Add(Position.Copy());
         
         // Infection
-        if (AnthraxLayer.GetValue(Position) > 0)
+        if (AnthraxLayer.IsInRaster(Position) && AnthraxLayer.GetValue(Position) > 0)
         {  
             // todo: Anthrax logic could go here…
-            Console.WriteLine($"This Impala is on an anthrax site @ {Position} -> Anthrax Case Count: {AnthraxLayer.GetValue(Position)} ({Layer.Context.CurrentTick})");
+            //Console.WriteLine($"This Impala is on an anthrax site @ {Position} -> Anthrax Case Count: {AnthraxLayer.GetValue(Position)} ({Layer.Context.CurrentTick})");
         }
 
+        // Leave Movement trace for heatmap
+        if (ImpalaMovement.IsInRaster(Position))
+        {
+            Console.WriteLine("leave trace");
+            ImpalaMovement[Position] += 0.1;
+        }
 
         // On last tick export movement of this agent as GeoJSON LineString
         if (Layer.GetCurrentTick() == Layer.Context.MaxTicks)
