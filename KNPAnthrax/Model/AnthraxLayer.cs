@@ -19,13 +19,18 @@ public class AnthraxLayer : RasterLayer, ISteppedActiveLayer
     
     public void PostTick()
     {
+        if (GetCurrentTick() == 1)
+        {
+            ToGeoJSON("AnthraxLayer_Start");
+        }
+        
         if (GetCurrentTick() == Context.MaxTicks)
         {
-            ToGeoJSON();
+            ToGeoJSON("AnthraxLayer_End");
         }
     }
     
-    public void ToGeoJSON()
+    public void ToGeoJSON(string filename)
     {
         var featureCollection = new FeatureCollection();
         var gf = NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory(4326);
@@ -66,7 +71,7 @@ public class AnthraxLayer : RasterLayer, ISteppedActiveLayer
         }
         
         var write = new GeoJsonWriter().Write(featureCollection);
-        File.WriteAllText($"{this.GetType().Name}.geojson", write);
+        File.WriteAllText($"{filename}.geojson", write);
     }
 
 }
