@@ -12,6 +12,7 @@ using Mars.Interfaces.Layers;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
+using NetTopologySuite.Operation.Distance;
 using Position = Mars.Interfaces.Environments.Position;
 
 namespace KNPAnthrax.Model;
@@ -80,6 +81,11 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     [PropertyDescription(Name = "MovementOnSavanna")]
     public double MovementOnSavanna { get; set; }
     
+    /// <summary>
+    ///    
+    /// </summary>
+    [PropertyDescription(Name = "MaxDistanceFromWaterInM")]
+    public double MaxDistanceFromWaterInM { get; set; }
     
     
     /// <summary>
@@ -144,7 +150,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
             Position = Position.CreateGeoPosition(Longitude, Latitude);
         }
 
-        Console.WriteLine($"I'm a kudu @ {Position}!");
+        //Console.WriteLine($"I'm a kudu @ {Position}!");
     }
 
 
@@ -197,7 +203,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                 {
                     if (RandomHelper.SmallerThan(MovementOnSavanna))
                     {
-                        // it's our low probabillity we allow the animal on the savanna area
+                        // it's our low probability we allow the animal on the savanna area
                     }
                     else
                     {
@@ -210,6 +216,19 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                     continue;
                 }
 
+                // if the agent is to far from a water source walk towards it!
+                var nearestWaterSource = WaterLayer.GetNearestWaterSource(Position);
+                var g = new Point(Position.X, Position.Y);
+                //var d = nearestWaterSource.VectorStructured.Geometry.Distance(g);
+                var ps = DistanceOp.NearestPoints(g, nearestWaterSource.VectorStructured.Geometry);
+                var wPos = new Position(ps[1].X, ps[1].Y);
+                var d = GeoPositionExtension.DistanceInMTo(Position, wPos);
+                
+                if (d > MaxDistanceFromWaterInM)
+                {
+                    bearing = Position.GetBearing(wPos);
+                }
+                
                 Position = Layer.KuduEnvironment.MoveTowards(this, bearing, distance);
                 moved = true;
             } while (!moved);
@@ -285,15 +304,18 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
         _positions.Add(Position.Copy());
         
         // Infection
-        if (AnthraxLayer.GetValue(Position) > 0)
+        
+        if (AnthraxLayer.IsInRaster(Position) && AnthraxLayer.GetValue(Position) > 0)
         {  
             // todo: Anthrax logic could go here…
             //Console.WriteLine($"This Kudu is on an anthrax site @ {Position} -> Anthrax Case Count: {AnthraxLayer.GetValue(Position)} ({Layer.Context.CurrentTick})");
         }
         
         // Leave Movement trace for heatmap
-        KuduMovement[Position] += 0.1;
-
+        if (KuduMovement.IsInRaster(Position))
+        {
+            KuduMovement[Position] += 0.1;
+        }
 
         // On last tick export movement of this agent as GeoJSON LineString
         if (Layer.GetCurrentTick() == Layer.Context.MaxTicks)
