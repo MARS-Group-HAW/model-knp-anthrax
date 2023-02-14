@@ -93,8 +93,16 @@ public class LandscapeLayer : VectorLayer
 
     public LandscapeType GetTypeForPosition(Position p)
     {
-        var f = FeatureOnPosition(p);
-        return GetTypeForFeature(f);
+        try
+        {
+            var f = FeatureOnPosition(p);
+            return GetTypeForFeature(f);
+        }
+        catch (ArgumentException e)
+        {
+            Console.WriteLine($"Tried moving to position with no landtype coverage {p}");
+            return LandscapeType.Unknown;
+        }
     }
     
     public IVectorFeature FindNearestLandAreaOfType(Position p, LandscapeType type)
@@ -123,11 +131,19 @@ public class LandscapeLayer : VectorLayer
     public bool IsTargetPositionOfSameCategory(Position currentPosition, Position targetPosition)
     {
         // determine the current feature we are on!
-        var currentFeature = FeatureOnPosition(currentPosition);
-        var targetFeature  = FeatureOnPosition(targetPosition);
+        try
+        {
+            var currentFeature = FeatureOnPosition(currentPosition);
+            var targetFeature = FeatureOnPosition(targetPosition);
 
-        return GetTypeForFeature(currentFeature)
-            .Equals(GetTypeForFeature(targetFeature));
+            return GetTypeForFeature(currentFeature)
+                .Equals(GetTypeForFeature(targetFeature));
+
+        }
+        catch (ArgumentException e)
+        {
+            return false;
+        }
 
         // todo:
         // 1. find "our" land category
@@ -148,7 +164,7 @@ public class LandscapeLayer : VectorLayer
                 return f;
             }
         }
-        
+        Console.WriteLine($"Position {p} is not covered by the provided Landscape Areas");
         throw new ArgumentException($"Position {p} is not covered by the provided Landscape Areas");
     }
 
