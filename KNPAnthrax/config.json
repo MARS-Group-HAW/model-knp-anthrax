@@ -93,7 +93,11 @@
       ],
       "mapping": [
         {
-          "parameter": "Energy",
+          "parameter": "SpawnMinEnergy",
+          "value": 50
+        },
+        {
+          "parameter": "SpawnMaxEnergy",
           "value": 100
         },
         {

@@ -39,8 +39,14 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     [PropertyDescription(Name = "Energy")]
     public double Energy { get; set; }
     
+    [PropertyDescription(Name = "SpawnMinEnergy")]
+    public double SpawnMinEnergy { get; set; }
+    
+    [PropertyDescription(Name = "SpawnMaxEnergy")]
+    public double SpawnMaxEnergy { get; set; }
+    
     /// <summary>
-    ///     Energy level of Agent
+    ///     
     /// </summary>
     [PropertyDescription(Name = "State")]
     public AnimalState State { get; set; }
@@ -122,7 +128,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
     public void Init(AnimalLayer layer)
     {
         Layer = layer;
-        Energy = RandomHelper.NextDouble(RandomHelper.Random, 50, 100);
+        Energy = RandomHelper.NextDouble(RandomHelper.Random, SpawnMinEnergy, SpawnMaxEnergy);
         State = AnimalState.RandomMove;
 
         if ((SpawnWoodlandProbability + SpawnSavannaProbability) != 1.0)
