@@ -248,7 +248,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                 //var nearestWaterSource = waterSources.First();
                 // @todo: RandomPositionFromGeometry() is needed since die direct way for LINESTRINGs would be the 
                 // requires the nearest POINT on the target geoemtry, but we don't have that from the API. So we just
-                // use a random position somwhere on the linestring, so at least we go in the right direction...
+                // use a random position somewhere on the linestring, so at least we go in the right direction...
                 var waterSourceLocation = nearestWaterSource.VectorStructured.Geometry.RandomPositionFromGeometry();
                 var target = new Position(waterSourceLocation.X, waterSourceLocation.Y);
                 
