@@ -1,6 +1,10 @@
 # KNP Anthrax Model
 
+Model for simulating movement of Kudus & Impalas in the norhtern part of the Kruger National Park (KNP), regaring the distribution of Anthrax pathogen.
 
+| Simulation Area: Norhtern KNP                  | Kudu & Imapal movments                                       | Anthrax densitiy                               |
+| ---------------------------------------------- | ------------------------------------------------------------ | ---------------------------------------------- |
+| ![Simulation Area](./docs/Simulation_Area.png) | ![Kudu and Imapala movement](./docs/Impala_and_Kudu_Movement.png) | ![Anthrax density](./docs/Anthrax_Density.png) |
 
 ## Running
 
