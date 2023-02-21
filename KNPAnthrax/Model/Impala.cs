@@ -20,6 +20,7 @@ namespace KNPAnthrax.Model;
 
 public class Impala : IAgent<AnimalLayer>, IPositionable
 {
+    public bool StoreTickResult { get; set; }
     
     /// <summary>
     ///     The latitude of the current geo-referenced position of the agent
@@ -133,13 +134,16 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
     public ImpalaMovement ImpalaMovement { get; set; }
     
     private List<LandscapeType> _preferredLandTypes = new(){ LandscapeType.Woodland, LandscapeType.Savanna };
-
-
-    private int _infectedCounter = 0;
+    
+    public int InfectedCounter { get; set; }
     private List<long> _LeaveAnthraxTraceTicks = new();
+    
+    public int InfectedTotalCounter { get; set; }
     
     public void Init(AnimalLayer layer)
     {
+        InfectedCounter = 0;
+        InfectedTotalCounter = 0;
         Layer = layer;
         Energy = RandomHelper.NextDouble(RandomHelper.Random, SpawnMinEnergy, SpawnMaxEnergy);
         State = AnimalState.RandomMove;
@@ -183,6 +187,14 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
     
     public void Tick()
     {
+        StoreTickResult = false;
+        if (Layer.Context.CurrentTick == Layer.Context.MaxTicks || Layer.Context.CurrentTick == 1)
+        {
+            // in the first/last sim tick store the agent data regardless of anthrax infections so, we have 
+            // the full set of agents in the output.
+            StoreTickResult = true;
+        }
+        
         // Movement
         if (State == AnimalState.RandomMove)
         {
@@ -310,7 +322,9 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
 
             if (RandomHelper.SmallerThan(beta))
             {
-                _infectedCounter += 1;
+                StoreTickResult = true;
+                InfectedTotalCounter += 1;
+                InfectedCounter += 1;
                 var deathOccuresInTicks = RandomHelper.NextInteger(RandomHelper.Random, MinInfectionDurationInTicks,
                     MaxInfectionDurationInTicks + 1);
                 var x = Layer.Context.CurrentTick + deathOccuresInTicks;
@@ -319,11 +333,12 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
         }
 
         // Leave Anthrax trail on the Map / animal dies
-        if (_infectedCounter > 0)
+        if (InfectedCounter > 0)
         {
             if (_LeaveAnthraxTraceTicks.Contains(Layer.Context.CurrentTick))
             {
-                _infectedCounter -= 1;
+                StoreTickResult = true;
+                InfectedCounter -= 1;
                 _LeaveAnthraxTraceTicks.Remove(Layer.Context.CurrentTick);
 
                 if (AnthraxLayer.IsInRaster(Position))

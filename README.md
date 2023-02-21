@@ -120,6 +120,14 @@ When running the project via a terminal or from within the Rider IDE (see the se
 
 - `Kudu_trips.geojson` and `Impala_trips.geojson` contain time series movement data of each agent type.
   - **Note:** Due to the 8h time resulation and the corresponding large movement distances per tick, kepler.gl is unable to visualize the movement well.
+  - **Note:** The file is only generated when `{"kind": "trips"}` is set, be aware that for long simulation/large agen cpunt this file might get to large to be rendered by the system.
+- `Impala.csv` and `Kudu.csv` will contain all agent attributes, notable are the following columns:
+  - `Tick`: Tck of simulation
+  - `DateTime`: current time of the simulation
+  - `InfectedCounter`: currently infected inside the agent/herd
+  - `InfectedTotalCounter`: total amount of infections inside the agent/herd
+  - See `Analysis/CSVAnalsis.ipnyb` for example visualisations.
+  - **Note**: only ticks/rows will be created for the first/last tick and if something for the infection related columns will change (to reduce file size/simulation time)
 - `LandscapeLayer_types.geojson` contains the mapping of the input land type file to the repsective landtype in the model (Woodland, Savanna).
 - `AnthraxLayer_Start.geojson` is the input raster data of the Anthrax distriubtion (the input ASC/GeoTIFF converted to GeoJSON).
 - `AnthraxLayer_End.geojson` is a heatmap showing the anthrax densitiy after all animals have left their traces.
