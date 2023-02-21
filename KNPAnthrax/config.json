@@ -22,7 +22,13 @@
     },
     {
       "name": "AnthraxLayer",
-      "file": "Resources/Northern KNP Anthrax.asc"
+      "file": "Resources/Northern KNP Anthrax.asc",
+      "mapping": [
+        {
+          "parameter": "WriteHeatMapToFileEveryXTicks",
+          "value": 21
+        }
+      ]
     },
     {
       "name":"WaterLayer",

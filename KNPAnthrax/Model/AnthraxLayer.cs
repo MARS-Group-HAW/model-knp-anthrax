@@ -1,5 +1,6 @@
 using System.IO;
 using Mars.Components.Layers;
+using Mars.Interfaces.Annotations;
 using Mars.Interfaces.Layers;
 using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
@@ -9,6 +10,13 @@ namespace KNPAnthrax.Model;
 
 public class AnthraxLayer : RasterLayer, ISteppedActiveLayer
 {
+    
+    /// <summary>
+    ///     Gets or sets the cell size in meter.
+    /// </summary>
+    [PropertyDescription(Name = "WriteHeatMapToFileEveryXTicks")]
+    public int WriteHeatMapToFileEveryXTicks { get; set; }
+    
     public void PreTick()
     {
     }
@@ -22,6 +30,11 @@ public class AnthraxLayer : RasterLayer, ISteppedActiveLayer
         if (GetCurrentTick() == 1)
         {
             ToGeoJSON("AnthraxLayer_Start");
+        }
+        
+        if (WriteHeatMapToFileEveryXTicks != 0 && GetCurrentTick() % WriteHeatMapToFileEveryXTicks == 0)
+        {
+            ToGeoJSON($"AnthraxLayer_Tick_{GetCurrentTick()}");
         }
         
         if (GetCurrentTick() == Context.MaxTicks)
