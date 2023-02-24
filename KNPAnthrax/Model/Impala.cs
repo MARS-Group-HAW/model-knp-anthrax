@@ -313,7 +313,11 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
         
         // Energy drops each tick
         Energy -= 1;
-        _positions.Add(Position.Copy());
+
+        if (OutputAgentTrack)
+        {
+            _positions.Add(Position.Copy());
+        }
         
         // Infection
         if (AnthraxLayer.IsInRaster(Position) && AnthraxLayer.GetValue(Position) > 0)
