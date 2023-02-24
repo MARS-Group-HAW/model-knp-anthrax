@@ -79,7 +79,7 @@ public class KuduMovement : RasterLayer, ISteppedActiveLayer
 
     public void PostTick()
     {
-        if (GetCurrentTick() % 50 == 0 ||  GetCurrentTick() == 1 || GetCurrentTick() == Context.MaxTicks)
+        if (GetCurrentTick() % 1 == 0 ||  GetCurrentTick() == 1 || GetCurrentTick() == Context.MaxTicks)
         {
             Console.WriteLine($"{GetCurrentTick()}/{Context.MaxTicks}");
         }
