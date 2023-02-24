@@ -100,7 +100,7 @@ public class LandscapeLayer : VectorLayer
         }
         catch (ArgumentException e)
         {
-            Console.WriteLine($"Tried moving to position with no landtype coverage {p}");
+            //Console.WriteLine($"Tried moving to position with no landtype coverage {p}");
             return LandscapeType.Unknown;
         }
     }
@@ -164,7 +164,7 @@ public class LandscapeLayer : VectorLayer
                 return f;
             }
         }
-        Console.WriteLine($"Position {p} is not covered by the provided Landscape Areas");
+        //Console.WriteLine($"Position {p} is not covered by the provided Landscape Areas");
         throw new ArgumentException($"Position {p} is not covered by the provided Landscape Areas");
     }
 

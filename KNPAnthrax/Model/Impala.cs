@@ -198,51 +198,59 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
         // Movement
         if (State == AnimalState.RandomMove)
         {
-            var moved = false;
-            do
+            
+            // in case we are on the wrong land type! Quickly move to the nearest comfortable area.
+            // this can happen after visiting an water source, or after initialization.
+            if (!_preferredLandTypes.Contains(LandscapeLayer.GetTypeForPosition(Position)))
             {
-                var bearing = RandomHelper.NextDouble(RandomHelper.Random, 0, 360);
-                var distance = GetDistance();
-                var target = Position.CalculateRelativePosition(bearing, distance);
-                
-                // is target still in area of KNP?
-                if (!Perimeter.IsPointInside(target))
-                {
-                    continue;
-                }
-                
-                // in case we are on the wrong land type! Quickly move to the nearest comfortable area.
-                // this can happen after visiting an water source, or after initialization.
-                if (!_preferredLandTypes.Contains(LandscapeLayer.GetTypeForPosition(Position)))
-                {
-                    var nearestPreferredFeature = LandscapeLayer.FindNearestLandAreaOfType(Position, _preferredLandTypes.First());  // TODO replace First() call with some land type decision logic
-                    var posInPreferredArea =nearestPreferredFeature.VectorStructured.Geometry.RandomPositionFromGeometry();
-                    bearing = Position.GetBearing(posInPreferredArea);
-                }
-
-                // is target of same category as our current position?
-                if (!LandscapeLayer.IsTargetPositionOfSameCategory(Position, target))
-                {
-                    continue;
-                }
-                
-                // if the agent is to far from a water source walk towards it!
-                var nearestWaterSource = WaterLayer.GetNearestWaterSource(Position);
-                var g = new Point(Position.X, Position.Y);
-                //var d = nearestWaterSource.VectorStructured.Geometry.Distance(g);
-                var ps = DistanceOp.NearestPoints(g, nearestWaterSource.VectorStructured.Geometry);
-                var wPos = new Position(ps[1].X, ps[1].Y);
-                var d = GeoPositionExtension.DistanceInMTo(Position, wPos);
-                
-                if (d > MaxDistanceFromWaterInM)
-                {
-                    bearing = Position.GetBearing(wPos);
-                }
-                
-
+                var nearestPreferredFeature = LandscapeLayer.FindNearestLandAreaOfType(Position, _preferredLandTypes.First());  // TODO replace First() call with some land type decision logic
+                var posInPreferredArea =nearestPreferredFeature.VectorStructured.Geometry.RandomPositionFromGeometry();
+                var bearing = Position.GetBearing(posInPreferredArea);
+                    
+                // also update the distance, so we at most walk directly onto of the preferred landscape
+                // but never farther, which might lead us out of the perimeter!
+                var distance = Math.Min(GetDistance(), Position.DistanceInMTo(posInPreferredArea));
                 Position = Layer.ImpalaEnvironment.MoveTowards(this, bearing, distance);
-                moved = true;
-            } while (!moved);
+            }
+            else
+            {
+                var moved = false;
+                do
+                {
+                    var bearing = RandomHelper.NextDouble(RandomHelper.Random, 0, 360);
+                    var distance = GetDistance();
+                    var target = Position.CalculateRelativePosition(bearing, distance);
+                
+                    // is target still in area of KNP?
+                    if (!Perimeter.IsPointInside(target))
+                    {
+                        continue;
+                    }
+
+                    // is target of same category as our current position?
+                    if (!_preferredLandTypes.Contains(LandscapeLayer.GetTypeForPosition(target)))
+                    {
+                        continue;
+                    }
+                
+                    // if the agent is to far from a water source walk towards it!
+                    var nearestWaterSource = WaterLayer.GetNearestWaterSource(Position);
+                    var g = new Point(Position.X, Position.Y);
+                    //var d = nearestWaterSource.VectorStructured.Geometry.Distance(g);
+                    var ps = DistanceOp.NearestPoints(g, nearestWaterSource.VectorStructured.Geometry);
+                    var wPos = new Position(ps[1].X, ps[1].Y);
+                    var d = GeoPositionExtension.DistanceInMTo(Position, wPos);
+                
+                    if (d > MaxDistanceFromWaterInM)
+                    {
+                        bearing = Position.GetBearing(wPos);
+                        distance = Math.Min(d, distance);
+                    }
+
+                    Position = Layer.ImpalaEnvironment.MoveTowards(this, bearing, distance);
+                    moved = true;
+                } while (!moved);
+            }
             
             if (Energy < 15)
             {

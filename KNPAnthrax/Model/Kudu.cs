@@ -208,66 +208,78 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
         // Movement
         if (State == AnimalState.RandomMove)
         {
-            var moved = false;
-            do
+            
+            // in case we are on the wrong land type! Quickly move to the nearest comfortable area.
+            // this can happen after visiting an water source, or after initialization.
+            if (!_preferredLandTypes.Contains(LandscapeLayer.GetTypeForPosition(Position)))
             {
-                var bearing = RandomHelper.NextDouble(RandomHelper.Random, 0, 360);
-                var distance = GetDistance();
-                var target = Position.CalculateRelativePosition(bearing, distance);
-                
-                // is target still in area of KNP?
-                if (!Perimeter.IsPointInside(target))
+                var nearestPreferredFeature = LandscapeLayer.FindNearestLandAreaOfType(Position, _preferredLandTypes.First());  // TODO replace First() call with some land type decision logic
+                var posInPreferredArea =nearestPreferredFeature.VectorStructured.Geometry.RandomPositionFromGeometry();
+                var bearing = Position.GetBearing(posInPreferredArea);
+                    
+                // also update the distance, so we at most walk directly onto of the preferred landscape
+                // but never farther, which might lead us out of the perimeter!
+                var distance = Math.Min(GetDistance(), Position.DistanceInMTo(posInPreferredArea));
+                Position = Layer.KuduEnvironment.MoveTowards(this, bearing, distance);
+            }
+            else
+            {
+                // we are in a comfortable spot, let's move random, and check land type/distance to water
+                var moved = false;
+                do
                 {
-                    continue;
-                }
-                
-                // in case we are on the wrong land type! Quickly move to the nearest comfortable area.
-                // this can happen after visiting an water source, or after initialization.
-                if (!_preferredLandTypes.Contains(LandscapeLayer.GetTypeForPosition(Position)))
-                {
-                    var nearestPreferredFeature = LandscapeLayer.FindNearestLandAreaOfType(Position, _preferredLandTypes.First());  // TODO replace First() call with some land type decision logic
-                    var posInPreferredArea =nearestPreferredFeature.VectorStructured.Geometry.RandomPositionFromGeometry();
-                    bearing = Position.GetBearing(posInPreferredArea);
-                }
-
-                // is target of same category as our current position?
-                var targetType = LandscapeLayer.GetTypeForPosition(target);
-                if (targetType == LandscapeType.Woodland)
-                {
-                    // every thing is fine.
-                } else if (targetType == LandscapeType.Savanna)
-                {
-                    if (RandomHelper.SmallerThan(MovementOnSavanna))
-                    {
-                        // it's our low probability we allow the animal on the savanna area
-                    }
-                    else
+                    var bearing = RandomHelper.NextDouble(RandomHelper.Random, 0, 360);
+                    var distance = GetDistance();
+                    var target = Position.CalculateRelativePosition(bearing, distance);
+                    
+                    // is target still in area of KNP?
+                    if (!Perimeter.IsPointInside(target))
                     {
                         continue;
                     }
-                }
-                else
-                {
-                    // unknown land type, try again!
-                    continue;
-                }
+                    
+                    // is target of same category as our current position?
+                    var targetType = LandscapeLayer.GetTypeForPosition(target);
+                    if (targetType == LandscapeType.Woodland)
+                    {
+                        // every thing is fine.
+                    } else if (targetType == LandscapeType.Savanna)
+                    {
+                        if (RandomHelper.SmallerThan(MovementOnSavanna))
+                        {
+                            // it's our low probability we allow the animal on the savanna area
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                    else
+                    {
+                        // unknown land type, try again!
+                        continue;
+                    }
 
-                // if the agent is to far from a water source walk towards it!
-                var nearestWaterSource = WaterLayer.GetNearestWaterSource(Position);
-                var g = new Point(Position.X, Position.Y);
-                //var d = nearestWaterSource.VectorStructured.Geometry.Distance(g);
-                var ps = DistanceOp.NearestPoints(g, nearestWaterSource.VectorStructured.Geometry);
-                var wPos = new Position(ps[1].X, ps[1].Y);
-                var d = GeoPositionExtension.DistanceInMTo(Position, wPos);
+                    // if the agent is to far from a water source walk towards it!
+                    var nearestWaterSource = WaterLayer.GetNearestWaterSource(Position);
+                    var g = new Point(Position.X, Position.Y);
+                    //var d = nearestWaterSource.VectorStructured.Geometry.Distance(g);
+                    var ps = DistanceOp.NearestPoints(g, nearestWaterSource.VectorStructured.Geometry);
+                    var wPos = new Position(ps[1].X, ps[1].Y);
+                    var d = GeoPositionExtension.DistanceInMTo(Position, wPos);
+                    
+                    if (d > MaxDistanceFromWaterInM)
+                    {
+                        bearing = Position.GetBearing(wPos);
+                        distance = Math.Min(d, distance);
+                    }
+                    
+                    Position = Layer.KuduEnvironment.MoveTowards(this, bearing, distance);
+                    moved = true;
+                } while (!moved);
                 
-                if (d > MaxDistanceFromWaterInM)
-                {
-                    bearing = Position.GetBearing(wPos);
-                }
                 
-                Position = Layer.KuduEnvironment.MoveTowards(this, bearing, distance);
-                moved = true;
-            } while (!moved);
+            }
             
             if (Energy < 15)
             {
