@@ -24,7 +24,6 @@ internal static class Program
         description.AddLayer<KuduMovement>();
         description.AddLayer<ImpalaMovement>();
 
-        description.AddAgent<Elephant, AnimalLayer>();
         description.AddAgent<Kudu, AnimalLayer>();
         description.AddAgent<Impala, AnimalLayer>();
 
