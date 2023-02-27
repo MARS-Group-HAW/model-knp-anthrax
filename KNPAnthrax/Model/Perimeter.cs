@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Mars.Components.Layers;
 using NetTopologySuite.Geometries;
@@ -20,8 +19,8 @@ public class Perimeter : VectorLayer
     /// </returns>
     public bool IsPointInside(Position coordinate)
     {
-        var g = new Point(coordinate.X, coordinate.Y);
-        return Features.First().VectorStructured.Geometry.Covers(g);
+        var p = new Point(coordinate.X, coordinate.Y);
+        return Features.First().VectorStructured.Geometry.Covers(p);
         
         // First, check if the coordinate is inside the area of the .asc file.
         // The comparison with "1" ensures that it's not a "non-walkable" cell (the area outside of our polygon).
