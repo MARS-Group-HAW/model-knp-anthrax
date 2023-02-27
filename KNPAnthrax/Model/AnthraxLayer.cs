@@ -10,13 +10,19 @@ namespace KNPAnthrax.Model;
 
 public class AnthraxLayer : RasterLayer, ISteppedActiveLayer
 {
-    
+
+    #region Properties
+
     /// <summary>
     ///     Gets or sets the cell size in meter.
     /// </summary>
     [PropertyDescription(Name = "WriteHeatMapToFileEveryXTicks")]
     public int WriteHeatMapToFileEveryXTicks { get; set; }
-    
+
+    #endregion
+
+    #region Tick
+
     public void PreTick()
     {
     }
@@ -27,23 +33,28 @@ public class AnthraxLayer : RasterLayer, ISteppedActiveLayer
     
     public void PostTick()
     {
-        if (GetCurrentTick() == 1)
+        var currentTick = GetCurrentTick();
+        if (currentTick == 1)
         {
-            ToGeoJSON("AnthraxLayer_Start");
+            ToGeoJson("AnthraxLayer_Start");
         }
         
-        if (WriteHeatMapToFileEveryXTicks != 0 && GetCurrentTick() % WriteHeatMapToFileEveryXTicks == 0)
+        if (WriteHeatMapToFileEveryXTicks != 0 && currentTick % WriteHeatMapToFileEveryXTicks == 0)
         {
-            ToGeoJSON($"AnthraxLayer_Tick_{GetCurrentTick()}");
+            ToGeoJson($"AnthraxLayer_Tick_{currentTick}");
         }
         
-        if (GetCurrentTick() == Context.MaxTicks)
+        if (currentTick == Context.MaxTicks)
         {
-            ToGeoJSON("AnthraxLayer_End");
+            ToGeoJson("AnthraxLayer_End");
         }
     }
-    
-    public void ToGeoJSON(string filename)
+
+    #endregion
+
+    #region Methods
+
+    private void ToGeoJson(string filename)
     {
         var featureCollection = new FeatureCollection();
         var gf = NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory(4326);
@@ -86,5 +97,7 @@ public class AnthraxLayer : RasterLayer, ISteppedActiveLayer
         var write = new GeoJsonWriter().Write(featureCollection);
         File.WriteAllText($"{filename}.geojson", write);
     }
+
+    #endregion
 
 }
