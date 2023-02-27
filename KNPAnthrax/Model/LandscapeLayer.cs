@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using Mars.Common;
 using Mars.Common.Core.Collections;
 using Mars.Common.Core.Random;
@@ -17,10 +16,12 @@ namespace KNPAnthrax.Model;
 
 public class LandscapeLayer : VectorLayer
 {
+    #region Properties and Fields
+
     /// <summary>
     /// Mapping of provided shape file regions to our two land-type categories.
     /// </summary>
-    public new static readonly Dictionary<int, LandscapeType> Mapping = new()
+    private new static readonly Dictionary<int, LandscapeType> Mapping = new()
     {
         {8,  LandscapeType.Woodland},
         {9,  LandscapeType.Savanna},
@@ -52,45 +53,73 @@ public class LandscapeLayer : VectorLayer
         {34, LandscapeType.Unknown},
     };
 
+    #endregion
+
+    #region Initialization
+
+    /// <summary>
+    ///     Initialization of the layer type.
+    /// </summary>
+    /// <param name="layerInitData">The initialization data provided by the simulation configuration</param>
+    /// <param name="registerAgentHandle">The agent registration handle of the layer type</param>
+    /// <param name="unregisterAgent">The agent un-registration handle of the layer type</param>
+    /// <returns>A boolean stating if initialization of the layer types base class was successful</returns>
     public override bool InitLayer(
         LayerInitData layerInitData,
         RegisterAgent registerAgentHandle = null,
         UnregisterAgent unregisterAgent = null)
     {
-        var parent =  base.InitLayer(layerInitData, registerAgentHandle, unregisterAgent);
+        var baseInitSuccessful = base.InitLayer(layerInitData, registerAgentHandle, unregisterAgent);
 
         // Save a GeoJSON with the current mapping of landscape types
         var featureCollection = new FeatureCollection();
-        foreach (var f in Features)
+        foreach (var feature in Features)
         {
             //var attrs = f.VectorStructured.Attributes;
             //attrs.Add("ModelLandType", GetTypeForFeature(f).ToString());
             
-            var attrs = new AttributesTable();
-            attrs.Add("LABEL", f.VectorStructured.Attributes["LABEL"]);
-            attrs.Add("ModelLandType", GetTypeForFeature(f).ToString());
-            attrs.Add("LSCAP_ID", f.VectorStructured.Attributes["LSCAP_ID"]);
+            var attributes = new AttributesTable
+            {
+                { "LABEL", feature.VectorStructured.Attributes["LABEL"] },
+                { "ModelLandType", GetTypeForFeature(feature).ToString() },
+                { "LSCAP_ID", feature.VectorStructured.Attributes["LSCAP_ID"] }
+            };
 
-            featureCollection.Add(new Feature(f.VectorStructured.Geometry, attrs));
+            featureCollection.Add(new Feature(feature.VectorStructured.Geometry, attributes));
         }
-        var write = new GeoJsonWriter().Write(featureCollection);
-        File.WriteAllText("LandscapeLayer_types.geojson", write);
+        var featureCollectionAsGeoJson = new GeoJsonWriter().Write(featureCollection);
+        File.WriteAllText("LandscapeLayer_types.geojson", featureCollectionAsGeoJson);
 
-        return parent;
+        return baseInitSuccessful;
     }
 
-    public LandscapeType GetTypeForFeature(IVectorFeature f)
+    #endregion
+
+    #region Methods
+    
+    /// <summary>
+    ///     Returns the landscape type for the given feature based on the ID of the feature.
+    /// </summary>
+    /// <param name="feature">The given feature</param>
+    /// <returns>The landscape type of the given feature</returns>
+    /// <exception cref="ApplicationException">Thrown if the given feature is not within the mapping</exception>
+    private static LandscapeType GetTypeForFeature(IVectorFeature feature)
     {
-        var id = Convert.ToInt32(f.VectorStructured.Attributes["LSCAP_ID"]);
+        var featureId = Convert.ToInt32(feature.VectorStructured.Attributes["LSCAP_ID"]);
 
-        if (Mapping.ContainsKey(id))
+        if (Mapping.ContainsKey(featureId))
         {
-            return Mapping[id];
+            return Mapping[featureId];
         }
 
-        throw new ApplicationException($"No Landscape Mapping found for LSCAP_ID = {id}");
+        throw new ApplicationException($"No Landscape Mapping found for LSCAP_ID = {featureId}");
     }
 
+    /// <summary>
+    ///     Gets the landscape type of the feature that contains the given position.
+    /// </summary>
+    /// <param name="p">The given position</param>
+    /// <returns>The identified landscape type</returns>
     public LandscapeType GetTypeForPosition(Position p)
     {
         try
@@ -100,27 +129,33 @@ public class LandscapeLayer : VectorLayer
         }
         catch (ArgumentException e)
         {
-            //Console.WriteLine($"Tried moving to position with no landtype coverage {p}");
+            //Console.WriteLine($"Tried moving to position with no land type coverage {p}");
             return LandscapeType.Unknown;
         }
     }
     
-    public IVectorFeature FindNearestLandAreaOfType(Position p, LandscapeType type)
+    /// <summary>
+    ///     Finds the feature that is nearest to the given position and of the given landscape type.
+    /// </summary>
+    /// <param name="position">The given position</param>
+    /// <param name="landscapeType">The given landscape type</param>
+    /// <returns>The identified feature</returns>
+    public IVectorFeature FindNearestLandAreaOfType(Position position, LandscapeType landscapeType)
     {
-        var g = new Point(p.X, p.Y);
-
-        var minDistanceToFeature = Double.MaxValue;
+        var positionAsPoint = new Point(position.X, position.Y);
+        var distanceToNearestFeature = double.MaxValue;
         IVectorFeature nearestFeature = new VectorFeature();
-        foreach (var vf in Features)
+        
+        foreach (var feature in Features)
         {
-            if (type == GetTypeForFeature(vf))
+            if (landscapeType == GetTypeForFeature(feature))
             {
-                var d = vf.VectorStructured.Geometry.Distance(g);
+                var distanceToFeature = feature.VectorStructured.Geometry.Distance(positionAsPoint);
 
-                if (d < minDistanceToFeature)
+                if (distanceToFeature < distanceToNearestFeature)
                 {
-                    nearestFeature = vf;
-                    minDistanceToFeature = d;
+                    nearestFeature = feature;
+                    distanceToNearestFeature = distanceToFeature;
                 }
             }
         }
@@ -136,9 +171,7 @@ public class LandscapeLayer : VectorLayer
             var currentFeature = FeatureOnPosition(currentPosition);
             var targetFeature = FeatureOnPosition(targetPosition);
 
-            return GetTypeForFeature(currentFeature)
-                .Equals(GetTypeForFeature(targetFeature));
-
+            return GetTypeForFeature(currentFeature).Equals(GetTypeForFeature(targetFeature));
         }
         catch (ArgumentException e)
         {
@@ -152,68 +185,51 @@ public class LandscapeLayer : VectorLayer
         // 4. is target position inside union!
     }
     
-    public IVectorFeature FeatureOnPosition(Position p)
-    {
-        var g = new Point(p.X, p.Y);
-        foreach (var f in Features)
-        {
-            // f.VectorStructured.Geometry.Contains(g)) fails if p is ON / part of the boundary of f!
-            // So we use Covers(), see https://nettopologysuite.github.io/NetTopologySuite/api/NetTopologySuite.Geometries.Geometry.html#NetTopologySuite_Geometries_Geometry_Contains_NetTopologySuite_Geometries_Geometry_
-            if (f.VectorStructured.Geometry.Covers(g))
-            {
-                return f;
-            }
-        }
-        //Console.WriteLine($"Position {p} is not covered by the provided Landscape Areas");
-        throw new ArgumentException($"Position {p} is not covered by the provided Landscape Areas");
-    }
-
     /// <summary>
-    /// Gets a random position somewhere in the simulation area where the landscapetype is of one of the given
-    /// types.
-    /// 
+    ///     Returns the feature that contains the given position.
     /// </summary>
-    /// <param name="types"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public Position GetRandomPositionForLandscapeType(List<LandscapeType> types)
+    /// <param name="position">The given position</param>
+    /// <returns>The identified feature</returns>
+    /// <exception cref="ArgumentException">Thrown if the given position is not within any of the features</exception>
+    private IVectorFeature FeatureOnPosition(Position position)
     {
-        // Shuffle all available features to get randomness
-        var shuffledFeatures = Features.ShuffleEnumerable(RandomHelper.Random);
-
-        foreach (var f in shuffledFeatures)
+        var positionAsPoint = new Point(position.X, position.Y);
+        foreach (var feature in Features)
         {
-            var featureType = GetTypeForFeature(f);
-            if (types.Contains(featureType))
-            {
-                return f.VectorStructured.Geometry.RandomPositionFromGeometry();
-            }
-        }
-        
-        throw new ArgumentException($"No shapes are available for the given types {types.ToString()}");
-    }
-    
-    /// <summary>
-    ///     Obtains a random POI that is of the given category (e.g., "restaurant").
-    /// </summary>
-    /// <param name="category">The given category</param>
-    /// <returns>A POI of the given category, if any exist</returns>
-    /// <exception cref="ArgumentException">Thrown if no POI of the given category exists</exception>
-    public IVectorFeature GetRandomPoiForCategory(string category)
-    {
-        // Shuffle all available features randomly so each POI has a chance of being selected.
-        var shuffledFeatures = Features.OrderBy(_ => new Random().Next()).ToList();
-
-        foreach (var feature in shuffledFeatures)
-        {
-            if ((string)feature.VectorStructured.Attributes["fclass"] == category)
+            // feature.VectorStructured.Geometry.Contains(positionAsPoint)) fails if positionAsPoint is exactly ON the
+            // boundary of feature! Use Covers(positionAsPoint) instead.
+            // See https://nettopologysuite.github.io/NetTopologySuite/api/NetTopologySuite.Geometries.Geometry.html#NetTopologySuite_Geometries_Geometry_Contains_NetTopologySuite_Geometries_Geometry_
+            if (feature.VectorStructured.Geometry.Covers(positionAsPoint))
             {
                 return feature;
             }
         }
+        //Console.WriteLine($"Position {p} is not covered by the provided Landscape Areas");
+        throw new ArgumentException($"Position {position} is not covered by the provided Landscape Areas");
+    }
 
-        // If we reach this code, no POI with this category is available, so abort the simulation.
-        throw new ArgumentException($"No POIs found with category '{category}");
+    /// <summary>
+    ///     Gets a random position within a feature that is classified as one of the given landscape types.
+    /// </summary>
+    /// <param name="landscapeTypes">The given landscape types</param>
+    /// <returns>An identified position</returns>
+    /// <exception cref="ArgumentException">Thrown if there exist none of the given landscape types</exception>
+    public Position GetRandomPositionForLandscapeType(List<LandscapeType> landscapeTypes)
+    {
+        // Shuffle all available features to get randomness
+        var shuffledFeatures = Features.ShuffleEnumerable(RandomHelper.Random);
+
+        foreach (var feature in shuffledFeatures)
+        {
+            var featureType = GetTypeForFeature(feature);
+            if (landscapeTypes.Contains(featureType))
+            {
+                return feature.VectorStructured.Geometry.RandomPositionFromGeometry();
+            }
+        }
+        
+        throw new ArgumentException($"No shapes are available for the given types {landscapeTypes}");
     }
     
+    #endregion
 }
