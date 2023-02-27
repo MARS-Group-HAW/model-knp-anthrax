@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using Mars.Components.Layers;
 using Mars.Interfaces.Annotations;
@@ -11,50 +10,18 @@ namespace KNPAnthrax.Model;
 
 public class ImpalaMovement : RasterLayer, ISteppedActiveLayer
 {
+
+    #region Properties and Fields
+
+    /// <summary>
+    ///     The perimeter of the simulation environment.
+    /// </summary>
     [PropertyDescription(Name = "Perimeter")]
     public Perimeter Fence { get; set; }
 
-        /// <summary>
-    /// 
-    /// </summary>
-    public void ToGeoJSON()
-    {
-        var featureCollection = new FeatureCollection();
-        var gf = NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory(4326);
+    #endregion
 
-        for (var x = 0; x < Width; x++)
-        {
-            for (var y = 0; y < Height; y++)
-            {
-                var value = this[x, y];
-                
-                if (value == 0)
-                {
-                    continue;
-                }
-
-                // p4      p3
-                // + ---- +
-                // |      |
-                // |      |
-                // + ---- + 
-                // p1      p2
-                var p = gf.CreatePolygon(new[] {
-                    new Coordinate(LowerLeft.X + CellWidth * x, LowerLeft.Y + CellHeight * y), // p1
-                    new Coordinate(LowerLeft.X + CellWidth * x + CellWidth, LowerLeft.Y + CellHeight * y), // p2
-                    new Coordinate(LowerLeft.X + CellWidth * x + CellWidth, LowerLeft.Y + CellHeight * y + CellHeight), // p3
-                    new Coordinate( LowerLeft.X + CellWidth * x, LowerLeft.Y + CellHeight * y + CellHeight), // p4
-                    new Coordinate(LowerLeft.X + CellWidth * x, LowerLeft.Y + CellHeight * y), // p1
-                });
-                var at = new AttributesTable();
-                at.Add("density", value);
-                featureCollection.Add(new Feature(p, at));
-            }
-        }
-        
-        var write = new GeoJsonWriter().Write(featureCollection);
-        File.WriteAllText($"{this.GetType().Name}.geojson", write);
-    }
+    #region Tick
 
     public void Tick()
     {
@@ -68,7 +35,54 @@ public class ImpalaMovement : RasterLayer, ISteppedActiveLayer
     {
         if (GetCurrentTick() == Context.MaxTicks)
         {
-            ToGeoJSON();
+            WriteMovementHeatMapToGeoJson();
         }
     }
+    
+    #endregion
+
+    #region Methods
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    private void WriteMovementHeatMapToGeoJson()
+    {
+        var featureCollection = new FeatureCollection();
+        var geometryFactory = NetTopologySuite.NtsGeometryServices.Instance.CreateGeometryFactory(4326);
+
+        for (var x = 0; x < Width; x++)
+        {
+            for (var y = 0; y < Height; y++)
+            {
+                var gridCellValue = this[x, y];
+                
+                if (gridCellValue == 0)
+                {
+                    continue;
+                }
+
+                // p4      p3
+                // + ---- +
+                // |      |
+                // |      |
+                // + ---- + 
+                // p1      p2
+                var polygon = geometryFactory.CreatePolygon(new[] {
+                    new Coordinate(LowerLeft.X + CellWidth * x, LowerLeft.Y + CellHeight * y), // p1
+                    new Coordinate(LowerLeft.X + CellWidth * x + CellWidth, LowerLeft.Y + CellHeight * y), // p2
+                    new Coordinate(LowerLeft.X + CellWidth * x + CellWidth, LowerLeft.Y + CellHeight * y + CellHeight), // p3
+                    new Coordinate( LowerLeft.X + CellWidth * x, LowerLeft.Y + CellHeight * y + CellHeight), // p4
+                    new Coordinate(LowerLeft.X + CellWidth * x, LowerLeft.Y + CellHeight * y), // p1
+                });
+                var attributesTable = new AttributesTable { { "density", gridCellValue } };
+                featureCollection.Add(new Feature(polygon, attributesTable));
+            }
+        }
+        
+        var featureCollectionAsGeoJson = new GeoJsonWriter().Write(featureCollection);
+        File.WriteAllText($"{GetType().Name}.geojson", featureCollectionAsGeoJson);
+    }
+    
+    #endregion
 }
