@@ -12,6 +12,7 @@ using NetTopologySuite.Features;
 using NetTopologySuite.Geometries;
 using NetTopologySuite.IO;
 using NetTopologySuite.Operation.Distance;
+using MathNet.Numerics.Distributions;
 using Position = Mars.Interfaces.Environments.Position;
 
 namespace KNPAnthrax.Model;
@@ -181,6 +182,11 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
     ///     The current position of the agent.
     /// </summary>
     public Position Position { get; set; }
+
+    /// <summary>
+    ///     The bearing of the the agent during the previous tick.
+    /// </summary>
+    private double _prevBearing;
     
     /// <summary>
     ///     A collection of positions that make up the agent's movement trajectory.
@@ -229,6 +235,7 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
 
     #region Tick
 
+    // TODO define bearing in terms of previous bearing
     public void Tick()
     {
         StoreTickResult = false;
@@ -250,19 +257,19 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
                 {
                     var nearestPreferredFeature = LandscapeLayer.FindNearestLandAreaOfType(Position, _preferredLandTypes.First());  // TODO replace First() call with some land type decision logic
                     var posInPreferredArea =nearestPreferredFeature.VectorStructured.Geometry.RandomPositionFromGeometry();
-                    var bearing = Position.GetBearing(posInPreferredArea);
+                    _prevBearing = Position.GetBearing(posInPreferredArea);
                     
                     // also update the distance, so we at most walk directly onto of the preferred landscape
                     // but never farther, which might lead us out of the perimeter!
                     var distance = Math.Min(GetDistance(), Position.DistanceInMTo(posInPreferredArea));
-                    Position = Layer.ImpalaEnvironment.MoveTowards(this, bearing, distance);
+                    Position = Layer.ImpalaEnvironment.MoveTowards(this, _prevBearing, distance);
                 }
                 else
                 {
                     var moved = false;
                     do
                     {
-                        var bearing = RandomHelper.Random.NextDouble(0, 360);
+                        var bearing = GetBearingBasedOnPreviousBearing();
                         var distance = GetDistance();
                         var target = Position.CalculateRelativePosition(bearing, distance);
                 
@@ -342,8 +349,8 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
                     var distance = Math.Min(target.DistanceInMTo(Position),  GetDistance());
                 
                     // ... and change the agent's bearing such that it looks in the direction of the water source
-                    var bearing = Position.GetBearing(target);
-                    Position = Layer.ImpalaEnvironment.MoveTowards(this, bearing, distance);
+                    _prevBearing = Position.GetBearing(target);
+                    Position = Layer.ImpalaEnvironment.MoveTowards(this, _prevBearing, distance);
 
                     // If the agent in close the the water source, increase its energy and change bearing
                     if (target.DistanceInMTo(Position) < 20)
@@ -449,6 +456,20 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
     private double GetDistance()
     {
         return RandomHelper.Random.NextDouble(MinMovementPerTickInM, MaxMovementPerTickInM);
+    }
+
+    private double GetBearingBasedOnPreviousBearing()
+    {
+        var bearing = new Normal(_prevBearing, 50).Sample();  // TODO make StdDev configurable?
+
+        if (bearing is < 0 or > 360)
+        {
+            bearing = Math.Abs(bearing) % 360;
+        }
+
+        _prevBearing = bearing;
+
+        return bearing;
     }
     
     #endregion

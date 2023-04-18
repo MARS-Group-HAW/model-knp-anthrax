@@ -46,7 +46,7 @@
   "agents": [
     {
       "name": "Kudu",
-      "count": 50,
+      "count": 1,
       "file":"Resources/kudus.csv",
       "outputs": [
         {"kind": "csv"}
@@ -107,7 +107,7 @@
         },
         {
           "parameter": "OutputAgentTrack",
-          "value": false
+          "value": true
         }
       ]
     },
@@ -166,21 +166,7 @@
         },
         {
           "parameter": "OutputAgentTrack",
-          "value": false
-        }
-      ]
-    },
-    {
-      "name": "Elephant",
-      "count": 0,
-      "file":"Resources/elephants.csv",
-      "outputs": [
-        {"kind": "trips"}
-      ],
-      "mapping": [
-        {
-          "parameter" : "Energy",
-          "value" : 100
+          "value": true
         }
       ]
     }
