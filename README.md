@@ -12,7 +12,7 @@ There are two options for setting up and using the project. **Option 1** allows 
 
 ### Option 1: Source Code
 
-1. Install the [.NET SDK 6.0](https://dotnet.microsoft.com/en-us/download), either manually or within an interactive development environment (IDE) like [JetBrains Rider](https://www.jetbrains.com/de-de/rider/).
+1. Install the [.NET SDK 10.0](https://dotnet.microsoft.com/en-us/download), either manually or within an interactive development environment (IDE) like [JetBrains Rider](https://www.jetbrains.com/de-de/rider/).
 2. Copy the project from GitHub to your machine in one of the following ways:
    - Clone the project by entering the command `git clone https://github.com/MARS-Group-HAW/knp-anthrax-model.git` (**Note:** to do this, you must have [Git](https://git-scm.com/downloads) installed).
    - Download the project by clicking the "Code" button and selecting "Download ZIP".
