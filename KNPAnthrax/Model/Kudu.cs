@@ -230,7 +230,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
         // no position set from kudu.csv -> choose random position according to land-type spawn probability
         if (Latitude == 0.0 || Longitude == 0.0)
         {
-            Position = LandscapeLayer.GetRandomPositionForLandscapeType(RandomHelper.SmallerThan(SpawnWoodlandProbability) ?
+            Position = LandscapeLayer.GetRandomPositionForLandscapeType(RandomHelper.Random.NextDouble() < SpawnWoodlandProbability ?
                 // spawn on Woodland
                 new List<LandscapeType> {LandscapeType.Woodland} :
                 // Spawn on Savanna   
@@ -299,7 +299,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
                         }
                         else if (targetType == LandscapeType.Savanna)
                         {
-                            if (RandomHelper.SmallerThan(MovementOnSavanna))
+                            if (RandomHelper.Random.NextDouble() < MovementOnSavanna)
                             {
                                 // it's our low probability we allow the animal on the savanna area
                             }
@@ -420,7 +420,7 @@ public class Kudu : IAgent<AnimalLayer>, IPositionable
         {
             var beta = AnthraxLayer.GetValue(Position) * AnthraxInfectionProbability;
 
-            if (RandomHelper.SmallerThan(beta))
+            if (RandomHelper.Random.NextDouble() < beta)
             {
                 StoreTickResult = true;
                 InfectedCounter += 1;

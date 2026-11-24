@@ -213,7 +213,7 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
         // no position set from kudu.csv -> choose random position according to land-type spawn probability
         if (Latitude == 0.0 || Longitude == 0.0)
         {
-            if (RandomHelper.SmallerThan(SpawnWoodlandProbability))
+            if (RandomHelper.Random.NextDouble() < SpawnWoodlandProbability)
             {
                 // spawn on Woodland
                 Position = LandscapeLayer.GetRandomPositionForLandscapeType(new List<LandscapeType>() {LandscapeType.Woodland});
@@ -393,7 +393,7 @@ public class Impala : IAgent<AnimalLayer>, IPositionable
         {
             var beta = AnthraxLayer.GetValue(Position) * AnthraxInfectionProbability;
 
-            if (RandomHelper.SmallerThan(beta))
+            if (RandomHelper.Random.NextDouble() < beta)
             {
                 StoreTickResult = true;
                 InfectedTotalCounter += 1;
